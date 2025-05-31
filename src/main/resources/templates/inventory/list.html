@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="layout/layout :: layout (~{::body}, 'Inventory')">
+
+<body>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Inventory Entries</h2>
+    <a class="btn btn-success" th:href="@{/inventory/new}">+ Add New Entry</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Batch</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Entry Date</th>
+            <th>Expiry</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="entry : ${inventoryEntries}">
+            <td th:text="${entry.batchCode}"></td>
+            <td th:text="${entry.product.name}"></td>
+            <td th:text="${entry.quantity + ' ' + entry.unit}"></td>
+            <td th:text="${entry.entryDate}"></td>
+            <td th:text="${entry.expiryDate}"></td>
+            <td>
+                <a class="btn btn-sm btn-primary" th:href="@{/inventory/edit/{id}(id=${entry.id})}">Edit</a>
+                <form th:action="@{/inventory/delete/{id}(id=${entry.id})}" method="post" style="display:inline">
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this entry?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

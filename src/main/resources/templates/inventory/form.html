@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en"
+      th:replace="layout/layout :: layout(~{::body}, 'Inventory Form')">
+
+<body>
+    <h2 th:text="${entry.id} == null ? 'Add Inventory Entry' : 'Edit Inventory Entry'"></h2>
+
+    <form th:action="@{/inventory/save}" th:object="${entry}" method="post" class="row g-3">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="col-md-6">
+            <label for="batchCode">Batch Code</label>
+            <input type="text" id="batchCode" th:field="*{batchCode}" class="form-control" required />
+        </div>
+
+        <div class="col-md-6">
+            <label for="productId">Product</label>
+            <select id="productId" name="productId" class="form-select" required>
+                <option value="" disabled selected>Select a product</option>
+                <option th:each="p : ${products}" th:value="${p.id}"
+                        th:text="${p.name}" th:selected="${p.id} == ${entry.product?.id}"></option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="quantity">Quantity</label>
+            <input type="number" id="quantity" step="0.01" th:field="*{quantity}" class="form-control" required />
+        </div>
+
+        <div class="col-md-3">
+            <label for="unit">Unit</label>
+            <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..." required />
+        </div>
+
+        <div class="col-md-3">
+            <label for="entryDate">Entry Date</label>
+            <input type="date" id="entryDate" name="entryDate" class="form-control" required
+                   th:value="${#temporals.format(entry.entryDate, 'yyyy-MM-dd')}" />
+        </div>
+
+        <div class="col-md-3">
+            <label for="expiryDate">Expiry Date</label>
+            <input type="date" id="expiryDate" name="expiryDate" class="form-control"
+                   th:value="${#temporals.format(entry.expiryDate, 'yyyy-MM-dd')}" />
+        </div>
+
+        <div class="col-12">
+            <label for="remarks">Remarks</label>
+            <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="2"></textarea>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Save</button>
+            <a th:href="@{/inventory}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</body>
+</html>
