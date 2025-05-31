@@ -56,4 +56,9 @@ public class InventoryServiceImpl implements IInventoryService {
         }
         inventoryEntryRepository.deleteById(id);
     }
+
+    @Override
+    public List<InventoryEntry> findBatchesByProduct(Long productId) {
+        return inventoryEntryRepository.findByProduct_IdOrderByEntryDateDesc(productId);
+    }
 }

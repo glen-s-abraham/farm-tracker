@@ -14,4 +14,6 @@ public interface IInventoryService {
     InventoryEntry update(Long id, InventoryEntry updatedEntry);
 
     void delete(Long id);
+
+    List<InventoryEntry> findBatchesByProduct(Long productId);
 }

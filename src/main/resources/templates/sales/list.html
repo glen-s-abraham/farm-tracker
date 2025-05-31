@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+
+<head>
+    <title>Sales Records</title>
+</head>
+<body>
+<div>
+    <h2>Sales Records</h2>
+    <a class="btn btn-success mb-3" th:href="@{/sales/new}">➕ Add New Sale</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+        <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Batch</th>
+            <th>Quantity</th>
+            <th>Price/Unit (₹)</th>
+            <th>Total (₹)</th>
+            <th>Sold On</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entry : ${salesList}">
+            <td th:text="${entry.id}"></td>
+            <td th:text="${entry.product.name}"></td>
+            <td th:text="${entry.batchCode}"></td>
+            <td th:text="${entry.quantitySold + ' ' + entry.unit}"></td>
+            <td th:text="${entry.pricePerUnit}"></td>
+            <td th:text="${entry.totalAmount}"></td>
+            <td th:text="${entry.saleDate}"></td>
+            <td>
+                <a th:href="@{/sales/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
+                <form th:action="@{/sales/delete/{id}(id=${entry.id})}" method="get" style="display:inline">
+                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this sale?')">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
