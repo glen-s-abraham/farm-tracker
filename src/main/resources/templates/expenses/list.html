@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
 
 <head>
     <title>Expense Records</title>
 </head>
+
 <body>
     <div>
         <h2>Expense Tracker</h2>
@@ -12,33 +12,40 @@
 
         <table class="table table-bordered table-striped">
             <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Amount (₹)</th>
-                <th>Date</th>
-                <th>Remarks</th>
-                <th>Actions</th>
-            </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount (₹)</th>
+                    <th>Date</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
-            <tr th:each="entry : ${expenses}">
-                <td th:text="${entry.id}"></td>
-                <td th:text="${entry.description}"></td>
-                <td th:text="${entry.category}"></td>
-                <td th:text="${entry.amount}"></td>
-                <td th:text="${entry.expenseDate}"></td>
-                <td th:text="${entry.remarks}"></td>
-                <td>
-                    <a th:href="@{/expenses/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
-                    <form th:action="@{/expenses/delete/{id}(id=${entry.id})}" method="post" style="display:inline">
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this expense?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
+                <tr th:each="entry : ${expenses}">
+                    <td th:text="${entry.id}"></td>
+                    <td th:text="${entry.description}"></td>
+                    <td th:text="${entry.category}"></td>
+                    <td th:text="${entry.type}"></td>
+                    <td th:text="${entry.amount}"></td>
+                    <td
+                        th:text="${entry.expenseDate != null ? #temporals.format(entry.expenseDate, 'dd-MM-yyyy') : ''}">
+                    </td>
+                    <td th:text="${entry.remarks}"></td>
+                    <td>
+                        <a th:href="@{/expenses/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
+                        <form th:action="@{/expenses/delete/{id}(id=${entry.id})}" method="post" style="display:inline">
+                            <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this expense?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
             </tbody>
         </table>
+
     </div>
 </body>
+
 </html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+<head>
+    <title>📊 Reports</title>
+</head>
+<body>
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h4>📈 Download Reports</h4>
+    </div>
+    <div class="card-body">
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <label class="form-label">From:</label>
+                <input type="date" id="startDate" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">To:</label>
+                <input type="date" id="endDate" class="form-control" />
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('sales-log')">📦 Sales Log</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('expense-log')">💸 Expense Log</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('sales-expense-summary')">📊 Sales vs Expenses</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('capex-opex-summary')">🏗️ CAPEX vs OPEX</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('net-profit')">💰 Net Profit</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('product-wise-sales')">📦 Product-wise Sales</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('category-wise-expenses')">📂 Category-wise Expenses</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('inventory', false)">📦 Current Inventory</button>
+            </div>
+            <div class="col">
+                <button class="btn btn-outline-primary w-100" onclick="download('consolidated')">🧾 Consolidated Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function download(type, includeDate = true) {
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
+
+        if (includeDate && (!start || !end)) {
+            alert("Please select both start and end dates.");
+            return;
+        }
+
+        const url = includeDate
+            ? `/api/reports/export/${type}?start=${start}&end=${end}`
+            : `/api/reports/export/${type}`;
+
+        window.location.href = url;
+    }
+</script>
+</body>
+</html>

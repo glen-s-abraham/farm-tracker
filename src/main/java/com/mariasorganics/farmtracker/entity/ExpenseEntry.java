@@ -2,7 +2,11 @@ package com.mariasorganics.farmtracker.entity;
 
 import java.time.LocalDate;
 
+import com.mariasorganics.farmtracker.enums.ExpenseType;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +31,9 @@ public class ExpenseEntry {
     private double amount;
 
     private LocalDate expenseDate;
+
+    @Enumerated(EnumType.STRING)
+    private ExpenseType type; // CAPEX or OPEX
 
     private String remarks;
 }
