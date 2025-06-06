@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://192.168.1.50:5432/mariasorganics
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update    # safer for production
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+
+
+  security:
+    user:
+      name: admin
+      password: admin123

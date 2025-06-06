@@ -2,9 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layout/layout :: layout (~{::body}, ~{::title})">
 
-<head>
-    <title th:text="${#strings.isEmpty(entry.id) ? 'Add Sale' : 'Edit Sale'}">Sales Form</title>
-</head>
 <body>
 <div class="card">
     <div class="card-header bg-success text-white">

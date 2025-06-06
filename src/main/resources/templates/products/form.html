@@ -2,9 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="layout/layout :: layout (~{::body}, ~{::title})">
 
-<head>
-    <title th:text="${#strings.isEmpty(product.id) ? 'Add Product' : 'Edit Product'}">Product Form</title>
-</head>
 
 <body>
 <div class="card">
