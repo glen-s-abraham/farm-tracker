@@ -1,5 +1,6 @@
 package com.mariasorganics.farmtracker.controller;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,17 @@ public class InventoryApiController {
         return inventoryService.findBatchesByProduct(productId).stream()
                 .map(entry -> {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("id", entry.getId()); // Include the ID
+                    map.put("id", entry.getId());
                     map.put("batchCode", entry.getBatchCode());
                     map.put("availableQuantity", entry.getQuantity());
+                    map.put("entryDate", entry.getEntryDate()); // Include entryDate for sorting
                     return map;
                 })
-                .sorted((a, b) -> Long.compare((Long) b.get("id"), (Long) a.get("id"))) // Sort by ID descending
+                .sorted((a, b) -> {
+                    LocalDate dateA = (LocalDate) a.get("entryDate");
+                    LocalDate dateB = (LocalDate) b.get("entryDate");
+                    return dateB.compareTo(dateA); // Descending order
+                })
                 .collect(Collectors.toList());
     }
 
