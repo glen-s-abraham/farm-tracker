@@ -13,13 +13,14 @@
         </div>
 
         <div class="col-md-6">
-            <label for="productId">Product</label>
-            <select id="productId" name="productId" class="form-select" required>
-                <option value="" disabled selected>Select a product</option>
-                <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"
-                    th:selected="${p.id} == ${entry.product?.id}"></option>
-            </select>
-        </div>
+    <label for="productId">Product</label>
+    <select id="productId" name="productId" class="form-select select2" required>
+        <option value="" disabled>Select a product</option>
+        <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"
+                th:selected="${p.id} == ${entry.product?.id}"></option>
+    </select>
+</div>
+
 
         <div class="col-md-3">
             <label for="quantity">Quantity</label>
@@ -79,6 +80,43 @@
             // Optional: trigger once on page load if editing an existing entry
             const selectedProductId = productSelect.value;
             if (selectedProductId) {
+                productSelect.dispatchEvent(new Event('change'));
+            }
+        });
+    </script>
+    <!-- jQuery must come first -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Then Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Select2 on product dropdown
+            $('.select2').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Select a product',
+                width: '100%' // Optional: to ensure full-width alignment
+            });
+
+            const productSelect = document.getElementById('productId');
+            const latestBatchCodeDisplay = document.getElementById('latestBatchCode');
+
+            productSelect.addEventListener('change', function () {
+                const productId = this.value;
+                if (!productId) return;
+
+                fetch(`/api/inventory/latest-batch?productId=${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        latestBatchCodeDisplay.textContent = data?.batchCode || 'N/A';
+                    })
+                    .catch(() => {
+                        latestBatchCodeDisplay.textContent = 'N/A';
+                    });
+            });
+
+            if (productSelect.value) {
                 productSelect.dispatchEvent(new Event('change'));
             }
         });
