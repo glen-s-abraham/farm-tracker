@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en"
-      th:replace="layout/layout :: layout (~{::body}, 'Inventory')">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="layout/layout :: layout (~{::body}, 'Inventory')">
 
 <body>
     <div>
@@ -21,7 +20,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr th:each="entry : ${inventoryEntries}">
+                <tr th:each="entry : ${inventoriesPage.content}">
                     <td th:text="${entry.id}"></td>
                     <td th:text="${entry.batchCode}"></td>
                     <td th:text="${entry.product.name}"></td>
@@ -31,13 +30,35 @@
                     <td th:text="${entry.remarks}"></td>
                     <td>
                         <a th:href="@{/inventory/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
-                        <form th:action="@{/inventory/delete/{id}(id=${entry.id})}" method="post" style="display:inline;">
-                            <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this entry?')">Delete</button>
+                        <form th:action="@{/inventory/delete/{id}(id=${entry.id})}" method="post"
+                            style="display:inline;">
+                            <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this entry?')">Delete</button>
                         </form>
                     </td>
                 </tr>
             </tbody>
         </table>
+        <!-- Pagination Controls -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${inventoriesPage.first} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/inventory'(page=${inventoriesPage.number - 1}, size=${inventoriesPage.size})}">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page <span th:text="${inventoriesPage.number + 1}">1</span> of <span
+                            th:text="${inventoriesPage.totalPages}">1</span>
+                    </span>
+                </li>
+                <li class="page-item" th:classappend="${inventoriesPage.last} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/inventory'(page=${inventoriesPage.number + 1}, size=${inventoriesPage.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </body>
+
 </html>

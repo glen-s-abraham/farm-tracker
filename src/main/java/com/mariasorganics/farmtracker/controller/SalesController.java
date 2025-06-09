@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +30,11 @@ public class SalesController {
     }
 
     @GetMapping
-    public String listSales(Model model) {
-        model.addAttribute("salesList", salesService.getAllSales());
+    public String list(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        Page<SalesEntry> salesEntryPage = salesService.getPaginated(page, size);
+        model.addAttribute("salesEntryPage", salesEntryPage);
         return "sales/list";
     }
 

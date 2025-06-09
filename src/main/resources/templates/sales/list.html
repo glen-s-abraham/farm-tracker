@@ -22,7 +22,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="entry : ${salesList}">
+        <tr th:each="entry : ${salesEntryPage.content}">
             <td th:text="${entry.id}"></td>
             <td th:text="${entry.product.name}"></td>
             <td th:text="${entry.batchCode}"></td>
@@ -39,6 +39,22 @@
         </tr>
         </tbody>
     </table>
+    <!-- Pagination Controls -->
+    <nav>
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${salesEntryPage.first} ? 'disabled'">
+                <a class="page-link" th:href="@{'/sales'(page=${salesEntryPage.number - 1}, size=${salesEntryPage.size})}">Previous</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">
+                    Page <span th:text="${salesEntryPage.number + 1}">1</span> of <span th:text="${salesEntryPage.totalPages}">1</span>
+                </span>
+            </li>
+            <li class="page-item" th:classappend="${salesEntryPage.last} ? 'disabled'">
+                <a class="page-link" th:href="@{'/sales'(page=${salesEntryPage.number + 1}, size=${salesEntryPage.size})}">Next</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

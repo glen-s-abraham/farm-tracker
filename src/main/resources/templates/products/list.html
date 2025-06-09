@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
 
 
 <body>
@@ -10,30 +9,50 @@
 
         <table class="table table-bordered table-striped">
             <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Unit</th>
-                <th>Category</th>
-                <th>Cost/Unit</th>
-                <th>Actions</th>
-            </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Unit</th>
+                    <th>Category</th>
+                    <th>Cost/Unit</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
-            <tr th:each="product : ${products}">
-                <td th:text="${product.id}"></td>
-                <td th:text="${product.name}"></td>
-                <td th:text="${product.unit}"></td>
-                <td th:text="${product.category}"></td>
-                <td th:text="${product.defaultCostPerUnit}"></td>
-                <td>
-                    <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-primary">Edit</a>
-                    <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-sm btn-danger"
-                       onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
-            </tr>
+                <tr th:each="product : ${productsPage.content}">
+                    <td th:text="${product.id}"></td>
+                    <td th:text="${product.name}"></td>
+                    <td th:text="${product.unit}"></td>
+                    <td th:text="${product.category}"></td>
+                    <td th:text="${product.defaultCostPerUnit}"></td>
+                    <td>
+                        <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn btn-sm btn-primary">Edit</a>
+                        <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
             </tbody>
         </table>
+        <!-- Pagination Controls -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${productsPage.first} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/product'(page=${productsPage.number - 1}, size=${productsPage.size})}">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page <span th:text="${productsPage.number + 1}">1</span> of <span
+                            th:text="${productsPage.totalPages}">1</span>
+                    </span>
+                </li>
+                <li class="page-item" th:classappend="${productsPage.last} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/product'(page=${productsPage.number + 1}, size=${productsPage.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </body>
+
 </html>

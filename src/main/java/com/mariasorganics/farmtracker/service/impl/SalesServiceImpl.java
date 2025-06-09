@@ -2,6 +2,10 @@ package com.mariasorganics.farmtracker.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +66,7 @@ public class SalesServiceImpl implements ISalesService {
                     .orElseThrow(() -> new IllegalArgumentException("Sale entry not found"));
 
             boolean sameBatch = existingSale.getProduct().getId().equals(entry.getProduct().getId()) &&
-                                existingSale.getBatchCode().equals(entry.getBatchCode());
+                    existingSale.getBatchCode().equals(entry.getBatchCode());
 
             if (sameBatch) {
                 double adjustedAvailable = currentInventory + existingSale.getQuantitySold();
@@ -112,5 +116,11 @@ public class SalesServiceImpl implements ISalesService {
         inventoryRepo.save(inventory);
 
         repo.delete(entry);
+    }
+
+    @Override
+    public Page<SalesEntry> getPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return repo.findAll(pageable);
     }
 }

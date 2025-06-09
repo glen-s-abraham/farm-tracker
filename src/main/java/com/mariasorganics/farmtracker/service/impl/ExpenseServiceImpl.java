@@ -2,6 +2,10 @@ package com.mariasorganics.farmtracker.service.impl;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mariasorganics.farmtracker.entity.ExpenseEntry;
@@ -35,5 +39,11 @@ public class ExpenseServiceImpl implements IExpenseService {
     @Override
     public void deleteById(Long id) {
         repo.deleteById(id);
+    }
+
+    @Override
+    public Page<ExpenseEntry> getPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return repo.findAll(pageable);
     }
 }

@@ -3,6 +3,10 @@ package com.mariasorganics.farmtracker.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mariasorganics.farmtracker.entity.Product;
@@ -41,5 +45,11 @@ public class ProductServiceImpl implements IProductService {
     public void deleteById(Long id) {
         Product product = getById(id); // Ensures existence
         repo.delete(product);
+    }
+
+    @Override
+    public Page<Product> getPaginated(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return repo.findAll(pageable);
     }
 }

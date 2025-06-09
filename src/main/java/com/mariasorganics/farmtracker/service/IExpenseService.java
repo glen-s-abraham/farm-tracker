@@ -2,6 +2,8 @@ package com.mariasorganics.farmtracker.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.mariasorganics.farmtracker.entity.ExpenseEntry;
 
 public interface IExpenseService {
@@ -9,4 +11,6 @@ public interface IExpenseService {
     ExpenseEntry getById(Long id);
     ExpenseEntry save(ExpenseEntry entry);
     void deleteById(Long id);
+    Page<ExpenseEntry> getPaginated(int page, int size);
+
 }

@@ -2,6 +2,7 @@ package com.mariasorganics.farmtracker.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 
 import com.mariasorganics.farmtracker.entity.Product;
 
@@ -10,5 +11,6 @@ public interface IProductService {
     Product getById(Long id);
     Product save(Product product);
     void deleteById(Long id);
+    Page<Product> getPaginated(int page, int size);
 }
 

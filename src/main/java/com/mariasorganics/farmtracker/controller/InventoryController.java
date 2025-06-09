@@ -1,5 +1,6 @@
 package com.mariasorganics.farmtracker.controller;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,7 +8,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.mariasorganics.farmtracker.entity.ExpenseEntry;
 import com.mariasorganics.farmtracker.entity.InventoryEntry;
 import com.mariasorganics.farmtracker.entity.Product;
 import com.mariasorganics.farmtracker.service.IInventoryService;
@@ -26,8 +29,11 @@ public class InventoryController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("inventoryEntries", inventoryService.getAll());
+    public String list(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        Page<InventoryEntry> inventoriesPage = inventoryService.getPaginated(page, size);
+        model.addAttribute("inventoriesPage", inventoriesPage);
         return "inventory/list";
     }
 
