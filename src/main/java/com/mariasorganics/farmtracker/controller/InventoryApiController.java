@@ -27,11 +27,13 @@ public class InventoryApiController {
         return inventoryService.findBatchesByProduct(productId).stream()
                 .map(entry -> {
                     Map<String, Object> map = new HashMap<>();
+                    map.put("id", entry.getId()); // Include the ID
                     map.put("batchCode", entry.getBatchCode());
                     map.put("availableQuantity", entry.getQuantity());
                     return map;
                 })
-                .sorted((a, b) -> ((String) b.get("batchCode")).compareTo((String) a.get("batchCode")))
+                .sorted((a, b) -> Long.compare((Long) b.get("id"), (Long) a.get("id"))) // Sort by ID descending
                 .collect(Collectors.toList());
     }
+
 }
