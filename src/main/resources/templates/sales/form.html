@@ -11,16 +11,18 @@
                 <input type="hidden" th:field="*{id}" />
                 <input type="hidden" id="originalBatchCode" th:value="*{batchCode}" />
 
-                <div class="mb-3">
-                    <label class="form-label">Product</label>
-                    <select class="form-select" th:field="*{productId}" id="productSelect" required>
+                <div class="col-md-6">
+                    <label for="productSelect">Product</label>
+                    <select id="productSelect" name="productId" class="form-select select2" th:field="*{productId}"
+                        required>
                         <option value="" disabled>Select a product</option>
                         <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Batch Code</label>
+                    <label class="form-label">Batch Code (Latest Batch Code: <code
+                            id="latestBatchCode">N/A</code>)</label>
                     <select class="form-select" th:field="*{batchCode}" id="batchSelect" required>
                         <option value="" disabled>Select a batch</option>
                     </select>
@@ -49,7 +51,8 @@
 
                 <div class="mb-3">
                     <label class="form-label">Sale Date</label>
-                    <input type="date" class="form-control" th:value="${#temporals.format(entry.saleDate, 'yyyy-MM-dd')}" required />
+                    <input type="date" class="form-control" id="saleDate" name="saleDate"
+                        th:value="${#temporals.format(entry.saleDate, 'yyyy-MM-dd')}" required />
                 </div>
 
                 <div class="mb-3">
@@ -64,21 +67,34 @@
             </form>
         </div>
     </div>
+    <!-- jQuery must come first -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <!-- Then Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        $(document).ready(function () {
+            $('#productSelect').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Select a product',
+                width: '100%'
+            });
+
             const productSelect = document.getElementById('productSelect');
             const batchSelect = document.getElementById('batchSelect');
             const availableQtyInput = document.getElementById('availableQty');
             const selectedBatchCode = document.getElementById('originalBatchCode')?.value || null;
+            const latestBatchCodeDisplay = document.getElementById('latestBatchCode');
 
-            const selectedProductId = productSelect.value;
-            if (selectedProductId) {
-                loadBatches(selectedProductId, selectedBatchCode);
+            if (productSelect.value) {
+                loadBatches(productSelect.value, selectedBatchCode);
+                fetchLatestBatch(productSelect.value);
             }
 
             productSelect.addEventListener('change', function () {
-                loadBatches(this.value, null);
+                loadBatches(this.value);
+                fetchLatestBatch(this.value);
             });
 
             batchSelect.addEventListener('change', function () {
@@ -86,16 +102,7 @@
                 availableQtyInput.value = qty || '';
             });
 
-            document.getElementById('saleForm').addEventListener('submit', function (e) {
-                const available = parseFloat(availableQtyInput.value || 0);
-                const selling = parseFloat(document.getElementById('quantitySold').value || 0);
-                if (selling > available) {
-                    e.preventDefault();
-                    alert('Quantity sold exceeds available inventory!');
-                }
-            });
-
-            function loadBatches(productId, selectedBatchCode = null) {
+            function loadBatches(productId, selected = null) {
                 batchSelect.innerHTML = '<option value="" disabled>Loading...</option>';
                 availableQtyInput.value = '';
 
@@ -108,16 +115,35 @@
                             option.value = batch.batchCode;
                             option.textContent = batch.batchCode;
                             option.setAttribute('data-qty', batch.availableQuantity);
-                            if (batch.batchCode === selectedBatchCode) {
+                            if (batch.batchCode === selected) {
                                 option.selected = true;
                                 availableQtyInput.value = batch.availableQuantity;
                             }
                             batchSelect.appendChild(option);
                         });
-
                         batchSelect.dispatchEvent(new Event('change'));
                     });
             }
+
+            function fetchLatestBatch(productId) {
+                fetch(`/api/inventory/latest-batch?productId=${productId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        latestBatchCodeDisplay.textContent = data?.batchCode || 'N/A';
+                    })
+                    .catch(() => {
+                        latestBatchCodeDisplay.textContent = 'N/A';
+                    });
+            }
+
+            document.getElementById('saleForm').addEventListener('submit', function (e) {
+                const available = parseFloat(availableQtyInput.value || 0);
+                const selling = parseFloat(document.getElementById('quantitySold').value || 0);
+                if (selling > available) {
+                    e.preventDefault();
+                    alert('Quantity sold exceeds available inventory!');
+                }
+            });
         });
     </script>
 </body>
