@@ -36,4 +36,19 @@ public class InventoryApiController {
                 .collect(Collectors.toList());
     }
 
+    @GetMapping("/latest-batch")
+    public Map<String, Object> getLatestBatchForProduct(@RequestParam Long productId) {
+        return inventoryService.findBatchesByProduct(productId).stream()
+                .sorted((a, b) -> Long.compare(b.getId(), a.getId())) // latest = highest ID
+                .findFirst()
+                .map(entry -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("batchCode", entry.getBatchCode());
+                    map.put("quantity", entry.getQuantity());
+                    map.put("entryDate", entry.getEntryDate());
+                    return map;
+                })
+                .orElse(null);
+    }
+
 }
