@@ -33,6 +33,10 @@
                     <li class="nav-item"><a class="nav-link" th:href="@{/sales}">Sales</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/expenses}">Expenses</a></li>
                     <li class="nav-item"><a class="nav-link" th:href="@{/reports}">Reports</a></li>
+                    <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/users}">Users</a>
+                    </li>
+
                 </ul>
 
                 <div class="d-flex" sec:authorize="isAuthenticated()">
