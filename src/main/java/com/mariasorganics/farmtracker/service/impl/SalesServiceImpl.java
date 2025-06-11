@@ -1,11 +1,13 @@
 package com.mariasorganics.farmtracker.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import com.mariasorganics.farmtracker.exception.ResourceNotFoundException;
 import com.mariasorganics.farmtracker.repository.InventoryEntryRepository;
 import com.mariasorganics.farmtracker.repository.SalesEntryRepository;
 import com.mariasorganics.farmtracker.service.ISalesService;
+import static com.mariasorganics.farmtracker.service.impl.helpers.SalesSpecifications.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -122,5 +125,21 @@ public class SalesServiceImpl implements ISalesService {
     public Page<SalesEntry> getPaginated(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         return repo.findAll(pageable);
+    }
+
+    public Page<SalesEntry> getFilteredPaginated(
+            String keyword,
+            LocalDate saleFrom, LocalDate saleTo,
+            String sortField, String sortDir,
+            int page, int size) {
+
+        Specification<SalesEntry> spec = Specification.where(hasKeyword(keyword))
+                .and(saleDateBetween(saleFrom, saleTo));
+
+        Sort sort = Sort.by(sortField != null ? sortField : "id");
+        sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return repo.findAll(spec, pageable);
     }
 }

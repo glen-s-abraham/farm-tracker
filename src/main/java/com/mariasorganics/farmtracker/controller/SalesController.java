@@ -7,12 +7,14 @@ import com.mariasorganics.farmtracker.service.IInventoryService;
 import com.mariasorganics.farmtracker.service.IProductService;
 import com.mariasorganics.farmtracker.service.ISalesService;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,11 +32,25 @@ public class SalesController {
     }
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page,
+    public String list(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate saleFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate saleTo,
             Model model) {
-        Page<SalesEntry> salesEntryPage = salesService.getPaginated(page, size);
+
+        Page<SalesEntry> salesEntryPage = salesService.getFilteredPaginated(
+                keyword, saleFrom, saleTo, sortField, sortDir, page, size);
+
         model.addAttribute("salesEntryPage", salesEntryPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("saleFrom", saleFrom);
+        model.addAttribute("saleTo", saleTo);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
         return "sales/list";
     }
 

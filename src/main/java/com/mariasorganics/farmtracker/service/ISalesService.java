@@ -1,5 +1,6 @@
 package com.mariasorganics.farmtracker.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -12,4 +13,9 @@ public interface ISalesService {
     SalesEntry save(SalesEntry salesEntry);
     void deleteById(Long id);
     Page<SalesEntry> getPaginated(int page, int size);
+    Page<SalesEntry> getFilteredPaginated(
+        String keyword,
+        LocalDate saleFrom, LocalDate saleTo,
+        String sortField, String sortDir,
+        int page, int size);
 }

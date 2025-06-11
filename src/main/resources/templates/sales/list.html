@@ -1,60 +1,123 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
 
 
 <body>
-<div>
-    <h2>Sales Records</h2>
-    <a class="btn btn-success mb-3" th:href="@{/sales/new}">➕ Add New Sale</a>
+    <div>
+        <h2>Sales Records</h2>
+        <a class="btn btn-success mb-3" th:href="@{/sales/new}">➕ Add New Sale</a>
+        <!-- Toggle Button -->
+        <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
+            data-bs-target="#advancedSalesFilters" aria-expanded="false" aria-controls="advancedSalesFilters">
+            🔍 Advanced Filters
+        </button>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-light">
-        <tr>
-            <th>ID</th>
-            <th>Product</th>
-            <th>Batch</th>
-            <th>Quantity</th>
-            <th>Price/Unit (₹)</th>
-            <th>Total (₹)</th>
-            <th>Sold On</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="entry : ${salesEntryPage.content}">
-            <td th:text="${entry.id}"></td>
-            <td th:text="${entry.product.name}"></td>
-            <td th:text="${entry.batchCode}"></td>
-            <td th:text="${entry.quantitySold + ' ' + entry.unit}"></td>
-            <td th:text="${entry.pricePerUnit}"></td>
-            <td th:text="${entry.totalAmount}"></td>
-            <td th:text="${entry.saleDate}"></td>
-            <td>
-                <a th:href="@{/sales/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
-                <form th:action="@{/sales/delete/{id}(id=${entry.id})}" method="get" style="display:inline">
-                    <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this sale?')">Delete</button>
+        <!-- Collapsible Filter Form -->
+        <div class="collapse" id="advancedSalesFilters">
+            <div class="card card-body border-0 shadow-sm mb-4">
+                <form method="get" th:action="@{/sales}" class="row g-3 align-items-end">
+
+                    <!-- Keyword Field -->
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control"
+                            placeholder="Batch / Product / Customer / Remarks">
+                    </div>
+
+                    <!-- Sale Date From -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sale Date From</label>
+                        <input type="date" name="saleFrom" th:value="${saleFrom}" class="form-control">
+                    </div>
+
+                    <!-- Sale Date To -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sale Date To</label>
+                        <input type="date" name="saleTo" th:value="${saleTo}" class="form-control">
+                    </div>
+
+                    <!-- Sort Field -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sort By</label>
+                        <select name="sortField" class="form-select">
+                            <option value="id" th:selected="${sortField == 'id'}">ID</option>
+                            <option value="batchCode" th:selected="${sortField == 'batchCode'}">Batch</option>
+                            <option value="product.name" th:selected="${sortField == 'product.name'}">Product</option>
+                            <option value="customerName" th:selected="${sortField == 'customerName'}">Customer</option>
+                            <option value="saleDate" th:selected="${sortField == 'saleDate'}">Sale Date</option>
+                            <option value="totalAmount" th:selected="${sortField == 'totalAmount'}">Total</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div class="col-md-1 col-sm-6">
+                        <label class="form-label">Order</label>
+                        <select name="sortDir" class="form-select">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Asc</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Desc</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter Button -->
+                    <div class="col-md-2 col-sm-12">
+                        <button type="submit" class="btn btn-primary w-100 mt-2">🔎 Filter</button>
+                    </div>
                 </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <!-- Pagination Controls -->
-    <nav>
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${salesEntryPage.first} ? 'disabled'">
-                <a class="page-link" th:href="@{'/sales'(page=${salesEntryPage.number - 1}, size=${salesEntryPage.size})}">Previous</a>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">
-                    Page <span th:text="${salesEntryPage.number + 1}">1</span> of <span th:text="${salesEntryPage.totalPages}">1</span>
-                </span>
-            </li>
-            <li class="page-item" th:classappend="${salesEntryPage.last} ? 'disabled'">
-                <a class="page-link" th:href="@{'/sales'(page=${salesEntryPage.number + 1}, size=${salesEntryPage.size})}">Next</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Product</th>
+                    <th>Batch</th>
+                    <th>Quantity</th>
+                    <th>Price/Unit (₹)</th>
+                    <th>Total (₹)</th>
+                    <th>Sold On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${salesEntryPage.content}">
+                    <td th:text="${entry.id}"></td>
+                    <td th:text="${entry.product.name}"></td>
+                    <td th:text="${entry.batchCode}"></td>
+                    <td th:text="${entry.quantitySold + ' ' + entry.unit}"></td>
+                    <td th:text="${entry.pricePerUnit}"></td>
+                    <td th:text="${entry.totalAmount}"></td>
+                    <td th:text="${entry.saleDate}"></td>
+                    <td>
+                        <a th:href="@{/sales/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
+                        <form th:action="@{/sales/delete/{id}(id=${entry.id})}" method="get" style="display:inline">
+                            <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this sale?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Pagination Controls -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${salesEntryPage.first} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/sales'(page=${salesEntryPage.number - 1}, size=${salesEntryPage.size})}">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page <span th:text="${salesEntryPage.number + 1}">1</span> of <span
+                            th:text="${salesEntryPage.totalPages}">1</span>
+                    </span>
+                </li>
+                <li class="page-item" th:classappend="${salesEntryPage.last} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/sales'(page=${salesEntryPage.number + 1}, size=${salesEntryPage.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </body>
+
 </html>
