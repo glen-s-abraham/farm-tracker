@@ -24,11 +24,24 @@ public class ProductController {
     }
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page,
+    public String list(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortDir,
             Model model) {
-        Page<Product> productsPage = productService.getPaginated(page, size);
+
+        Page<Product> productsPage = productService.getFilteredPaginated(
+                keyword, category, sortField, sortDir, page, size);
+
         model.addAttribute("productsPage", productsPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+
         return "products/list";
     }
 

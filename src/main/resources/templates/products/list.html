@@ -6,6 +6,62 @@
     <div>
         <h2>Product Catalog</h2>
         <a class="btn btn-success mb-3" th:href="@{/products/add}">➕ Add New Product</a>
+        <!-- Collapsible Advanced Filter -->
+        <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
+            data-bs-target="#advancedProductFilters" aria-expanded="false" aria-controls="advancedProductFilters">
+            🔍 Advanced Filters
+        </button>
+
+        <div class="collapse" id="advancedProductFilters">
+            <div class="card card-body border-0 shadow-sm mb-4">
+                <form method="get" th:action="@{/products}" class="row g-3 align-items-end">
+
+                    <!-- Keyword -->
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control"
+                            placeholder="Name / Unit">
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Category</label>
+                        <select name="category" class="form-select">
+                            <option value="">All</option>
+                            <option value="Fresh" th:selected="${category == 'Fresh'}">Fresh</option>
+                            <option value="Dried" th:selected="${category == 'Dried'}">Dried</option>
+                            <option value="Processed" th:selected="${category == 'Processed'}">Processed</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Field -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sort By</label>
+                        <select name="sortField" class="form-select">
+                            <option value="id" th:selected="${sortField == 'id'}">ID</option>
+                            <option value="name" th:selected="${sortField == 'name'}">Name</option>
+                            <option value="category" th:selected="${sortField == 'category'}">Category</option>
+                            <option value="defaultCostPerUnit" th:selected="${sortField == 'defaultCostPerUnit'}">
+                                Cost/Unit</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Order</label>
+                        <select name="sortDir" class="form-select">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Asc</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Desc</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-md-2 col-sm-12">
+                        <button type="submit" class="btn btn-primary w-100 mt-2">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
 
         <table class="table table-bordered table-striped">
             <thead class="table-light">
