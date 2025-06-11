@@ -5,6 +5,78 @@
     <div>
         <h2>Inventory Entries</h2>
         <a class="btn btn-success mb-3" th:href="@{/inventory/new}">➕ Add New Entry</a>
+        <!-- Toggle Button -->
+        <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
+            data-bs-target="#advancedFilters" aria-expanded="false" aria-controls="advancedFilters">
+            🔍 Advanced Filters
+        </button>
+
+        <!-- Collapsible Search Form -->
+        <div class="collapse" id="advancedFilters">
+            <div class="card card-body border-0 shadow-sm mb-4">
+
+                <form method="get" th:action="@{/inventory}" class="row g-3 align-items-end">
+
+                    <!-- Keyword -->
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control"
+                            placeholder="Batch / Product / Remarks">
+                    </div>
+
+                    <!-- Entry Date Range -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Entry Date From</label>
+                        <input type="date" name="entryFrom" th:value="${entryFrom}" class="form-control">
+                    </div>
+
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Entry Date To</label>
+                        <input type="date" name="entryTo" th:value="${entryTo}" class="form-control">
+                    </div>
+
+                    <!-- Expiry Date Range -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Expiry Date From</label>
+                        <input type="date" name="expiryFrom" th:value="${expiryFrom}" class="form-control">
+                    </div>
+
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Expiry Date To</label>
+                        <input type="date" name="expiryTo" th:value="${expiryTo}" class="form-control">
+                    </div>
+
+                    <!-- Sort Field -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sort By</label>
+                        <select name="sortField" class="form-select">
+                            <option value="id" th:selected="${sortField == 'id'}">ID</option>
+                            <option value="batchCode" th:selected="${sortField == 'batchCode'}">Batch</option>
+                            <option value="quantity" th:selected="${sortField == 'quantity'}">Quantity</option>
+                            <option value="entryDate" th:selected="${sortField == 'entryDate'}">Entry Date</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Order</label>
+                        <select name="sortDir" class="form-select">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Asc</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Desc</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="col-md-2 col-sm-12">
+                        <button type="submit" class="btn btn-primary w-100 mt-2">🔎 Filter</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+
+
 
         <table class="table table-bordered table-striped">
             <thead class="table-light">

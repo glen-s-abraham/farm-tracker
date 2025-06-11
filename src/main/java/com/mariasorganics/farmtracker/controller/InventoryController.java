@@ -1,6 +1,9 @@
 package com.mariasorganics.farmtracker.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,11 +32,30 @@ public class InventoryController {
     }
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "0") int page,
+    public String list(
+            @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String sortField,
+            @RequestParam(required = false, defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryTo,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryFrom,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryTo,
             Model model) {
-        Page<InventoryEntry> inventoriesPage = inventoryService.getPaginated(page, size);
+
+        Page<InventoryEntry> inventoriesPage = inventoryService.getFilteredPaginated(
+                keyword, sortField, sortDir, entryFrom, entryTo, expiryFrom, expiryTo, page, size);
+
         model.addAttribute("inventoriesPage", inventoriesPage);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("entryFrom", entryFrom);
+        model.addAttribute("entryTo", entryTo);
+        model.addAttribute("expiryFrom", expiryFrom);
+        model.addAttribute("expiryTo", expiryTo);
+
         return "inventory/list";
     }
 

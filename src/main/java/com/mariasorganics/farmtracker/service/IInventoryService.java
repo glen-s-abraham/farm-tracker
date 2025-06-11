@@ -1,5 +1,6 @@
 package com.mariasorganics.farmtracker.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -18,5 +19,11 @@ public interface IInventoryService {
     void delete(Long id);
 
     List<InventoryEntry> findBatchesByProduct(Long productId);
+
     Page<InventoryEntry> getPaginated(int page, int size);
+
+    Page<InventoryEntry> getFilteredPaginated(String keyword, String sortField, String sortDir,
+            LocalDate entryFrom, LocalDate entryTo,
+            LocalDate expiryFrom, LocalDate expiryTo,
+            int page, int size);
 }

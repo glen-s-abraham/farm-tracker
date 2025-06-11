@@ -9,10 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import static com.mariasorganics.farmtracker.service.impl.helpers.InventorySpecifications.*;
+
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InventoryServiceImpl implements IInventoryService {
@@ -35,7 +38,8 @@ public class InventoryServiceImpl implements IInventoryService {
 
     @Override
     public InventoryEntry getById(Long id) {
-        return inventoryEntryRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("InventoryEntry not found with ID: " + id));
+        return inventoryEntryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("InventoryEntry not found with ID: " + id));
     }
 
     @Override
@@ -71,5 +75,22 @@ public class InventoryServiceImpl implements IInventoryService {
     public Page<InventoryEntry> getPaginated(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
         return inventoryEntryRepository.findAll(pageable);
+    }
+
+    @Override
+    public Page<InventoryEntry> getFilteredPaginated(String keyword, String sortField, String sortDir,
+            LocalDate entryFrom, LocalDate entryTo,
+            LocalDate expiryFrom, LocalDate expiryTo,
+            int page, int size) {
+
+        Specification<InventoryEntry> spec = Specification.where(hasKeyword(keyword))
+                .and(entryDateBetween(entryFrom, entryTo))
+                .and(expiryDateBetween(expiryFrom, expiryTo));
+
+        Sort sort = Sort.by(sortField != null ? sortField : "id");
+        sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() : sort.descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return inventoryEntryRepository.findAll(spec, pageable);
     }
 }
