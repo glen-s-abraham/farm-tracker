@@ -1,64 +1,140 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+
 <head>
     <title>Expenses</title>
 </head>
+
 <body>
-<div class="container mt-4">
-    <h2>Expense Tracker</h2>
+    <div class="container mt-4">
+        <h2>Expense Tracker</h2>
 
 
-    <a class="btn btn-success mb-3" th:href="@{/expenses/new}">➕ Add New Expense</a>
+        <a class="btn btn-success mb-3" th:href="@{/expenses/new}">➕ Add New Expense</a>
+        <!-- Collapsible Filter Toggle -->
+        <button class="btn btn-outline-secondary mb-3" type="button" data-bs-toggle="collapse"
+            data-bs-target="#advancedExpenseFilters" aria-expanded="false" aria-controls="advancedExpenseFilters">
+            🔍 Advanced Filters
+        </button>
 
-    <table class="table table-bordered table-striped" id="expenseTable">
-        <thead class="table-light">
-            <tr>
-                <th>ID</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Amount (₹)</th>
-                <th>Date</th>
-                <th>Remarks</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="entry : ${expensesPage.content}">
-                <td th:text="${entry.id}"></td>
-                <td th:text="${entry.description}"></td>
-                <td th:text="${entry.category}"></td>
-                <td th:text="${entry.type}"></td>
-                <td th:text="${entry.amount}"></td>
-                <td th:text="${entry.expenseDate != null ? #temporals.format(entry.expenseDate, 'dd-MM-yyyy') : ''}"></td>
-                <td th:text="${entry.remarks}"></td>
-                <td>
-                    <a th:href="@{/expenses/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
-                    <form th:action="@{/expenses/delete/{id}(id=${entry.id})}" method="post" style="display:inline">
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this expense?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Collapsible Filter Section -->
+        <div class="collapse" id="advancedExpenseFilters">
+            <div class="card card-body border-0 shadow-sm mb-4">
+                <form method="get" th:action="@{/expenses}" class="row g-3 align-items-end">
 
-    <!-- Pagination Controls -->
-    <nav>
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${expensesPage.first} ? 'disabled'">
-                <a class="page-link" th:href="@{'/expenses'(page=${expensesPage.number - 1}, size=${expensesPage.size})}">Previous</a>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">
-                    Page <span th:text="${expensesPage.number + 1}">1</span> of <span th:text="${expensesPage.totalPages}">1</span>
-                </span>
-            </li>
-            <li class="page-item" th:classappend="${expensesPage.last} ? 'disabled'">
-                <a class="page-link" th:href="@{'/expenses'(page=${expensesPage.number + 1}, size=${expensesPage.size})}">Next</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+                    <!-- Keyword -->
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Search</label>
+                        <input type="text" name="keyword" th:value="${keyword}" class="form-control"
+                            placeholder="Description / Category / Remarks">
+                    </div>
+
+                    <!-- Date From -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Date From</label>
+                        <input type="date" name="expenseFrom" th:value="${expenseFrom}" class="form-control">
+                    </div>
+
+                    <!-- Date To -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Date To</label>
+                        <input type="date" name="expenseTo" th:value="${expenseTo}" class="form-control">
+                    </div>
+
+                    <!-- Type -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Type</label>
+                        <select name="type" class="form-select">
+                            <option value="">All</option>
+                            <option value="CAPEX" th:selected="${type == 'CAPEX'}">CAPEX</option>
+                            <option value="OPEX" th:selected="${type == 'OPEX'}">OPEX</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Field -->
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Sort By</label>
+                        <select name="sortField" class="form-select">
+                            <option value="expenseDate" th:selected="${sortField == 'expenseDate'}">Date</option>
+                            <option value="amount" th:selected="${sortField == 'amount'}">Amount</option>
+                            <option value="description" th:selected="${sortField == 'description'}">Description</option>
+                            <option value="type" th:selected="${sortField == 'type'}">Type</option>
+                        </select>
+                    </div>
+
+                    <!-- Sort Order -->
+                    <div class="col-md-1 col-sm-6">
+                        <label class="form-label">Order</label>
+                        <select name="sortDir" class="form-select">
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Asc</option>
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Desc</option>
+                        </select>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="col-md-2 col-sm-12">
+                        <button type="submit" class="btn btn-primary w-100 mt-2">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-striped" id="expenseTable">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Amount (₹)</th>
+                    <th>Date</th>
+                    <th>Remarks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry : ${expensesPage.content}">
+                    <td th:text="${entry.id}"></td>
+                    <td th:text="${entry.description}"></td>
+                    <td th:text="${entry.category}"></td>
+                    <td th:text="${entry.type}"></td>
+                    <td th:text="${entry.amount}"></td>
+                    <td
+                        th:text="${entry.expenseDate != null ? #temporals.format(entry.expenseDate, 'dd-MM-yyyy') : ''}">
+                    </td>
+                    <td th:text="${entry.remarks}"></td>
+                    <td>
+                        <a th:href="@{/expenses/edit/{id}(id=${entry.id})}" class="btn btn-sm btn-primary">Edit</a>
+                        <form th:action="@{/expenses/delete/{id}(id=${entry.id})}" method="post" style="display:inline">
+                            <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this expense?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Pagination Controls -->
+        <nav>
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${expensesPage.first} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/expenses'(page=${expensesPage.number - 1}, size=${expensesPage.size})}">Previous</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">
+                        Page <span th:text="${expensesPage.number + 1}">1</span> of <span
+                            th:text="${expensesPage.totalPages}">1</span>
+                    </span>
+                </li>
+                <li class="page-item" th:classappend="${expensesPage.last} ? 'disabled'">
+                    <a class="page-link"
+                        th:href="@{'/expenses'(page=${expensesPage.number + 1}, size=${expensesPage.size})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 
 </body>
+
 </html>
