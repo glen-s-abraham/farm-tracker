@@ -17,6 +17,7 @@ import com.mariasorganics.farmtracker.exception.ResourceNotFoundException;
 import com.mariasorganics.farmtracker.repository.InventoryEntryRepository;
 import com.mariasorganics.farmtracker.repository.SalesEntryRepository;
 import com.mariasorganics.farmtracker.service.ISalesService;
+
 import static com.mariasorganics.farmtracker.service.impl.helpers.SalesSpecifications.*;
 
 import lombok.RequiredArgsConstructor;
@@ -71,37 +72,51 @@ public class SalesServiceImpl implements ISalesService {
             boolean sameBatch = existingSale.getProduct().getId().equals(entry.getProduct().getId()) &&
                     existingSale.getBatchCode().equals(entry.getBatchCode());
 
-            if (sameBatch) {
-                double adjustedAvailable = currentInventory + existingSale.getQuantitySold();
+            if (entry.getQuantitySold() != existingSale.getQuantitySold() || !sameBatch) {
 
-                if (entry.getQuantitySold() > adjustedAvailable) {
-                    throw new IllegalArgumentException("Not enough inventory to update the sale.");
+                if (sameBatch) {
+                    double adjustedAvailable = currentInventory + existingSale.getQuantitySold();
+                    double quantityDiff = existingSale.getQuantitySold() - entry.getQuantitySold();
+
+                    if (entry.getQuantitySold() > adjustedAvailable) {
+                        throw new IllegalArgumentException("Not enough inventory to update the sale.");
+                    }
+
+                    SalesEntry updated = repo.save(entry);
+
+                    // Handle reduction: return difference to inventory
+                    if (quantityDiff > 0) {
+                        inventory.setQuantity(currentInventory + quantityDiff);
+                    } else {
+                        inventory.setQuantity(adjustedAvailable - entry.getQuantitySold());
+                    }
+
+                    inventoryRepo.save(inventory);
+                    return updated;
+                } else {
+                    // Revert old batch quantity
+                    InventoryEntry oldInventory = inventoryRepo
+                            .findByProduct_IdAndBatchCode(existingSale.getProduct().getId(),
+                                    existingSale.getBatchCode())
+                            .orElseThrow(() -> new IllegalArgumentException("Old batch inventory not found"));
+
+                    oldInventory.setQuantity(oldInventory.getQuantity() + existingSale.getQuantitySold());
+                    inventoryRepo.save(oldInventory);
+
+                    // Check new batch inventory
+                    if (entry.getQuantitySold() > currentInventory) {
+                        throw new IllegalArgumentException("Not enough inventory in new batch.");
+                    }
+
+                    SalesEntry updated = repo.save(entry);
+                    inventory.setQuantity(currentInventory - entry.getQuantitySold());
+                    inventoryRepo.save(inventory);
+
+                    return updated;
                 }
-
-                SalesEntry updated = repo.save(entry);
-                inventory.setQuantity(adjustedAvailable - entry.getQuantitySold());
-                inventoryRepo.save(inventory);
-                return updated;
-
             } else {
-                // Revert old batch quantity
-                InventoryEntry oldInventory = inventoryRepo
-                        .findByProduct_IdAndBatchCode(existingSale.getProduct().getId(), existingSale.getBatchCode())
-                        .orElseThrow(() -> new IllegalArgumentException("Old batch inventory not found"));
-
-                oldInventory.setQuantity(oldInventory.getQuantity() + existingSale.getQuantitySold());
-                inventoryRepo.save(oldInventory);
-
-                // Check new batch inventory
-                if (entry.getQuantitySold() > currentInventory) {
-                    throw new IllegalArgumentException("Not enough inventory in new batch.");
-                }
-
-                SalesEntry updated = repo.save(entry);
-                inventory.setQuantity(currentInventory - entry.getQuantitySold());
-                inventoryRepo.save(inventory);
-
-                return updated;
+                // Only non-quantity fields are updated, skip inventory adjustment
+                return repo.save(entry);
             }
         }
     }
