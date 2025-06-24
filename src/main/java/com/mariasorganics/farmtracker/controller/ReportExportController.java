@@ -98,4 +98,42 @@ public class ReportExportController {
                 ExcelReportGenerator.generateExcelFromMap("Consolidated Report",
                                 reportService.getConsolidatedReport(start, end), response, "consolidated_report.xlsx");
         }
+
+        @GetMapping("/net-sales")
+        public void exportNetSales(
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+                        HttpServletResponse response) throws IOException {
+                ExcelReportGenerator.generateExcelFromMap("Net Sales",
+                                Map.of("Net Sales", reportService.getNetSales(start, end)), response, "net_sales.xlsx");
+        }
+
+        @GetMapping("/total-production")
+        public void exportTotalProduction(
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+                        HttpServletResponse response) throws IOException {
+                ExcelReportGenerator.generateExcelFromMap("Total Production",
+                                Map.of("Total Production", reportService.getTotalProduction(start, end)), response,
+                                "total_production.xlsx");
+        }
+
+        @GetMapping("/opex")
+        public void exportOpex(
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+                        HttpServletResponse response) throws IOException {
+                ExcelReportGenerator.generateExcelFromMap("Operating Cost (OPEX)",
+                                Map.of("OPEX", reportService.getOpex(start, end)), response, "opex_summary.xlsx");
+        }
+
+        @GetMapping("/capex")
+        public void exportCapex(
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+                        HttpServletResponse response) throws IOException {
+                ExcelReportGenerator.generateExcelFromMap("Capital Expenditure (CAPEX)",
+                                Map.of("CAPEX", reportService.getCapex(start, end)), response, "capex_summary.xlsx");
+        }
+
 }

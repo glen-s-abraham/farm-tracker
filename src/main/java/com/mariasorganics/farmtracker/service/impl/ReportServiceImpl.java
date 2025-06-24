@@ -115,4 +115,47 @@ public class ReportServiceImpl implements IReportService {
         report.put("CAPEX vs OPEX", getCapexAndOpexTotals(start, end));
         return report;
     }
+
+    @Override
+    public double getNetSales(LocalDate start, LocalDate end) {
+        return salesRepo.findBySaleDateBetween(start, end)
+                .stream()
+                .mapToDouble(SalesEntry::getTotalAmount)
+                .sum();
+    }
+
+    @Override
+    public double getTotalProduction(LocalDate start, LocalDate end) {
+        double sold = salesRepo.findBySaleDateBetween(start, end)
+                .stream()
+                .mapToDouble(SalesEntry::getQuantitySold)
+                .sum();
+        double remaining = inventoryRepo.findAll()
+                .stream()
+                .filter(i -> i.getEntryDate() != null &&
+                        !i.getEntryDate().isBefore(start) &&
+                        !i.getEntryDate().isAfter(end))
+                .mapToDouble(InventoryEntry::getQuantity)
+                .sum();
+        return sold + remaining;
+    }
+
+    @Override
+    public double getOpex(LocalDate start, LocalDate end) {
+        return expenseRepo.findByExpenseDateBetween(start, end)
+                .stream()
+                .filter(e -> e.getType() == ExpenseType.OPEX)
+                .mapToDouble(ExpenseEntry::getAmount)
+                .sum();
+    }
+
+    @Override
+    public double getCapex(LocalDate start, LocalDate end) {
+        return expenseRepo.findByExpenseDateBetween(start, end)
+                .stream()
+                .filter(e -> e.getType() == ExpenseType.CAPEX)
+                .mapToDouble(ExpenseEntry::getAmount)
+                .sum();
+    }
+
 }

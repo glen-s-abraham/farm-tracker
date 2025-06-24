@@ -23,4 +23,13 @@ public interface IReportService {
     Map<String, Double> getCategoryWiseExpenses(LocalDate start, LocalDate end);
 
     Map<String, Object> getConsolidatedReport(LocalDate start, LocalDate end);
+
+    double getNetSales(LocalDate start, LocalDate end);
+
+    double getTotalProduction(LocalDate start, LocalDate end);
+
+    double getOpex(LocalDate start, LocalDate end);
+
+    double getCapex(LocalDate start, LocalDate end);
+
 }
