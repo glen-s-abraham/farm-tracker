@@ -19,9 +19,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">Category</label>
-                    <input type="text" th:field="*{category}" class="form-control"
-                        placeholder="e.g., Packaging, Transport" required />
+                    <select class="form-select" th:field="*{category}" required>
+                        <option value="" disabled selected>Select category</option>
+                        <option th:each="c : ${T(com.mariasorganics.farmtracker.enums.ExpenseCategory).values()}"
+                            th:value="${c}" th:text="${#strings.capitalize(c.name().replace('_', ' ').toLowerCase())}">
+                        </option>
+                    </select>
                 </div>
+
 
                 <div class="mb-3">
                     <label class="form-label">Expense Type</label>

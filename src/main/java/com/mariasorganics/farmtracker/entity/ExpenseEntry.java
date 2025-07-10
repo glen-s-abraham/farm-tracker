@@ -2,6 +2,7 @@ package com.mariasorganics.farmtracker.entity;
 
 import java.time.LocalDate;
 
+import com.mariasorganics.farmtracker.enums.ExpenseCategory;
 import com.mariasorganics.farmtracker.enums.ExpenseType;
 
 import jakarta.persistence.Entity;
@@ -26,7 +27,8 @@ public class ExpenseEntry extends Auditable<String> {
 
     private String description;
 
-    private String category; // e.g., Packaging, Transport, Fertilizer
+    @Enumerated(EnumType.STRING)
+    private ExpenseCategory category;
 
     private double amount;
 

@@ -1,0 +1,29 @@
+package com.mariasorganics.farmtracker.enums;
+
+public enum ExpenseCategory {
+    RAW_MATERIALS,
+    INFRASTRUCTURE,
+    CLEANING_SUPPLIES,
+    PACKAGING,
+    TRANSPORT,
+    UTILITIES,
+    MAINTENANCE,
+    LABOR,
+    RENT,
+    MARKETING,
+    SALES_COMMISSIONS,
+    LICENSES,
+    FERTILIZER,
+    EQUIPMENT,
+    DEPRECIATION,
+    OTHER,
+    BED,
+    CULTIVATION,
+    ELECTRICALS,
+    PROCESSING,
+    PRODUCTION,
+    SPAWN,
+    TRANSPORTATION 
+}
+
+
