@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+
+<head>
+    <title>Grow Rooms</title>
+</head>
+
+<body>
+<div class="container mt-4">
+    <h2>Grow Room Management</h2>
+
+    <a class="btn btn-success mb-3" th:href="@{/grow-rooms/new}">➕ Add New Grow Room</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="room : ${rooms}">
+                <td th:text="${room.id}"></td>
+                <td th:text="${room.name}"></td>
+                <td th:text="${room.location}"></td>
+                <td>
+                    <a th:href="@{/grow-rooms/edit/{id}(id=${room.id})}" class="btn btn-sm btn-primary">Edit</a>
+                    <form th:action="@{/grow-rooms/delete/{id}(id=${room.id})}" method="post" style="display:inline">
+                        <button class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this grow room?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

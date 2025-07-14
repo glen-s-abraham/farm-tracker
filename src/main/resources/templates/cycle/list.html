@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout/layout :: layout (~{::body}, ~{::title})">
+
+<head>
+    <title>Cycles</title>
+</head>
+
+<body>
+<div class="container mt-4">
+    <h2>Production Cycles</h2>
+
+    <a class="btn btn-success mb-3" th:href="@{/cycles/new}">➕ Add New Cycle</a>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Cycle Name</th>
+                <th>Grow Room</th>
+                <th>Start Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${cycles}">
+                <td th:text="${c.id}"></td>
+                <td th:text="${c.name}"></td>
+                <td th:text="${c.growRoom.name}"></td>
+                <td th:text="${#temporals.format(c.startDate, 'dd-MM-yyyy')}"></td>
+                <td th:text="${c.status}"></td>
+                <td>
+                    <a th:href="@{/cycles/edit/{id}(id=${c.id})}" class="btn btn-sm btn-primary">Edit</a>
+                    <form th:action="@{/cycles/delete/{id}(id=${c.id})}" method="post" style="display:inline">
+                        <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this cycle?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
