@@ -56,7 +56,11 @@ public class SalesController {
 
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("entry", new SalesEntry()); // ensure 'entry' is never null
+        SalesEntry entry = new SalesEntry();
+        entry.setSaleDate(LocalDate.now());
+        entry.setUnit("Packet");
+        entry.setPricePerUnit(100);
+        model.addAttribute("entry", entry); // ensure 'entry' is never null
         model.addAttribute("products", productService.getAllProducts());
         return "sales/form";
     }
