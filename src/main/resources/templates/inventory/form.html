@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="layout/layout :: layout(~{::body}, 'Inventory Form')">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" 
+      th:replace="layout/layout :: layout(~{::body}, 'Inventory Form')">
 
 <body>
     <h2 th:text="${entry.id} == null ? 'Add Inventory Entry' : 'Edit Inventory Entry'"></h2>
@@ -7,121 +8,88 @@
     <form th:action="@{/inventory/save}" th:object="${entry}" method="post" class="row g-3">
         <input type="hidden" th:field="*{id}" />
 
-        <div class="col-md-6">
-            <label for="batchCode">Batch Code (Latest Batch Code: <code id="latestBatchCode">N/A</code>)</label>
-            <input type="text" id="batchCode" th:field="*{batchCode}" class="form-control" required />
+        <!-- Show Batch Code only if editing -->
+        <div class="col-md-6" th:if="${entry.batchCode != null}">
+            <label for="batchCode">Batch Code</label>
+            <input type="text" id="batchCode" th:field="*{batchCode}" class="form-control" readonly />
         </div>
 
+        <!-- Product Dropdown -->
         <div class="col-md-6">
             <label for="productId">Product</label>
             <select id="productId" name="productId" class="form-select select2" required>
                 <option value="" disabled>Select a product</option>
                 <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"
-                    th:selected="${p.id} == ${entry.product?.id}"></option>
+                        th:selected="${p.id} == ${entry.product?.id}"></option>
             </select>
         </div>
 
+        <!-- Cycle Dropdown -->
+        <div class="col-md-6">
+            <label for="cycleId">Cycle</label>
+            <select id="cycleId" name="cycleId" class="form-select select2" required>
+                <option value="" disabled>Select a cycle</option>
+                <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
+                        th:selected="${c.id} == ${entry.cycle?.id}"></option>
+            </select>
+        </div>
 
+        <!-- Show Harvest Count only if editing -->
+        <div class="col-md-3" th:if="${entry.id != null}">
+            <label for="harvestCount">Harvest Count</label>
+            <input type="number" id="harvestCount" th:field="*{harvestCount}" class="form-control" readonly />
+        </div>
+
+        <!-- Quantity -->
         <div class="col-md-3">
             <label for="quantity">Quantity</label>
             <input type="number" id="quantity" step="0.01" th:field="*{quantity}" class="form-control" required />
         </div>
 
+        <!-- Unit -->
         <div class="col-md-3">
             <label for="unit">Unit</label>
             <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..." required />
         </div>
 
+        <!-- Entry Date -->
         <div class="col-md-3">
             <label for="entryDate">Entry Date</label>
             <input type="date" id="entryDate" name="entryDate" class="form-control" required
-                th:value="${#temporals.format(entry.entryDate, 'yyyy-MM-dd')}" />
+                   th:value="${#temporals.format(entry.entryDate, 'yyyy-MM-dd')}" />
         </div>
 
+        <!-- Expiry Date -->
         <div class="col-md-3">
             <label for="expiryDate">Expiry Date</label>
             <input type="date" id="expiryDate" name="expiryDate" class="form-control"
-                th:value="${#temporals.format(entry.expiryDate, 'yyyy-MM-dd')}" />
+                   th:value="${#temporals.format(entry.expiryDate, 'yyyy-MM-dd')}" />
         </div>
 
+        <!-- Remarks -->
         <div class="col-12">
             <label for="remarks">Remarks</label>
             <textarea id="remarks" th:field="*{remarks}" class="form-control" rows="2"></textarea>
         </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-success">Save</button>
-            <a th:href="@{/inventory}" class="btn btn-secondary">Cancel</a>
+        <!-- Save/Cancel -->
+        <div class="col-12 d-flex justify-content-between">
+            <a th:href="@{/inventory}" class="btn btn-secondary">← Back</a>
+            <button type="submit" class="btn btn-success">💾 Save</button>
         </div>
     </form>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const productSelect = document.getElementById('productId');
-            const latestBatchCodeDisplay = document.getElementById('latestBatchCode');
 
-            productSelect.addEventListener('change', function () {
-                const productId = this.value;
-                if (!productId) return;
-
-                fetch(`/api/inventory/latest-batch?productId=${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data && data.batchCode) {
-                            latestBatchCodeDisplay.textContent = data.batchCode;
-                        } else {
-                            latestBatchCodeDisplay.textContent = 'N/A';
-                        }
-                    })
-                    .catch(() => {
-                        latestBatchCodeDisplay.textContent = 'N/A';
-                    });
-            });
-
-            // Optional: trigger once on page load if editing an existing entry
-            const selectedProductId = productSelect.value;
-            if (selectedProductId) {
-                productSelect.dispatchEvent(new Event('change'));
-            }
-        });
-    </script>
-    <!-- jQuery must come first -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-    <!-- Then Select2 -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Initialize Select2 on product dropdown
             $('.select2').select2({
                 theme: 'bootstrap-5',
-                placeholder: 'Select a product',
-                width: '100%' // Optional: to ensure full-width alignment
+                width: '100%'
             });
-
-            const productSelect = document.getElementById('productId');
-            const latestBatchCodeDisplay = document.getElementById('latestBatchCode');
-
-            productSelect.addEventListener('change', function () {
-                const productId = this.value;
-                if (!productId) return;
-
-                fetch(`/api/inventory/latest-batch?productId=${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        latestBatchCodeDisplay.textContent = data?.batchCode || 'N/A';
-                    })
-                    .catch(() => {
-                        latestBatchCodeDisplay.textContent = 'N/A';
-                    });
-            });
-
-            if (productSelect.value) {
-                productSelect.dispatchEvent(new Event('change'));
-            }
         });
     </script>
-
 </body>
-
 </html>

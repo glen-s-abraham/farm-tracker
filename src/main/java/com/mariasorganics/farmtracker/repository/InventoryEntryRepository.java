@@ -15,4 +15,6 @@ public interface InventoryEntryRepository extends JpaRepository<InventoryEntry, 
     List<InventoryEntry> findByProduct_IdOrderByEntryDateDesc(Long productId);
 
     Optional<InventoryEntry> findByProduct_IdAndBatchCode(Long productId, String batchCode);
+
+    List<InventoryEntry> findByCycle_IdOrderByHarvestCountDesc(Long cycleId);
 }

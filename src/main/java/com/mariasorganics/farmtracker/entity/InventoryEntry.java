@@ -19,27 +19,25 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class InventoryEntry extends Auditable<String>{
+public class InventoryEntry extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String batchCode;
-
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-
+    @ManyToOne
+    @JoinColumn(name = "cycle_id", nullable = false)
+    private Cycle cycle;
+    private int harvestCount;
     private double quantity;
-
-    private String unit; // e.g., "kg", "liters", "packets"
-
+    private String unit;
     private LocalDate entryDate;
-
     private LocalDate expiryDate;
-
     private String remarks;
-
     @Transient
     private Long productId;
+    @Transient
+    private Long cycleId;
 }
