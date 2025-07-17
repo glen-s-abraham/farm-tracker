@@ -19,21 +19,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping({"/inventory"})
+@RequestMapping({ "/inventory" })
 public class InventoryController {
    private final IInventoryService inventoryService;
    private final IProductService productService;
    private final ICycleService cycleService;
 
-   public InventoryController(IInventoryService inventoryService, IProductService productService, ICycleService cycleService) {
+   public InventoryController(IInventoryService inventoryService, IProductService productService,
+         ICycleService cycleService) {
       this.inventoryService = inventoryService;
       this.productService = productService;
       this.cycleService = cycleService;
    }
 
    @GetMapping
-   public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String keyword, @RequestParam(required = false) String sortField, @RequestParam(required = false,defaultValue = "desc") String sortDir, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryFrom, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryTo, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryFrom, @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryTo, Model model) {
-      Page<InventoryEntry> inventoriesPage = this.inventoryService.getFilteredPaginated(keyword, sortField, sortDir, entryFrom, entryTo, expiryFrom, expiryTo, page, size);
+   public String list(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+         @RequestParam(required = false) String keyword, @RequestParam(required = false) String sortField,
+         @RequestParam(required = false, defaultValue = "desc") String sortDir,
+         @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryFrom,
+         @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate entryTo,
+         @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryFrom,
+         @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expiryTo, Model model) {
+      Page<InventoryEntry> inventoriesPage = this.inventoryService.getFilteredPaginated(keyword, sortField, sortDir,
+            entryFrom, entryTo, expiryFrom, expiryTo, page, size);
       model.addAttribute("inventoriesPage", inventoriesPage);
       model.addAttribute("keyword", keyword);
       model.addAttribute("sortField", sortField);
@@ -45,15 +53,20 @@ public class InventoryController {
       return "inventory/list";
    }
 
-   @GetMapping({"/new"})
+   @GetMapping({ "/new" })
    public String createForm(Model model) {
-      model.addAttribute("entry", new InventoryEntry());
+      InventoryEntry entry = new InventoryEntry();
+      entry.setUnit("Packet"); // Default unit
+      entry.setEntryDate(LocalDate.now()); // Today's date
+      entry.setExpiryDate(LocalDate.now().plusDays(2)); // +2 days from today
+
+      model.addAttribute("entry", entry);
       model.addAttribute("products", this.productService.getAllProducts());
       model.addAttribute("cycles", this.cycleService.getAll());
       return "inventory/form";
    }
 
-   @PostMapping({"/save"})
+   @PostMapping({ "/save" })
    public String save(@ModelAttribute InventoryEntry entry) {
       Product product = this.productService.getById(entry.getProductId());
       entry.setProduct(product);
@@ -66,7 +79,7 @@ public class InventoryController {
       return "redirect:/inventory";
    }
 
-   @GetMapping({"/edit/{id}"})
+   @GetMapping({ "/edit/{id}" })
    public String editForm(@PathVariable Long id, Model model) {
       model.addAttribute("entry", this.inventoryService.getById(id));
       model.addAttribute("products", this.productService.getAllProducts());
@@ -74,7 +87,7 @@ public class InventoryController {
       return "inventory/form";
    }
 
-   @PostMapping({"/delete/{id}"})
+   @PostMapping({ "/delete/{id}" })
    public String delete(@PathVariable Long id) {
       this.inventoryService.delete(id);
       return "redirect:/inventory";

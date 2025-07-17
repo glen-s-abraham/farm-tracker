@@ -9,7 +9,7 @@
         <input type="hidden" th:field="*{id}" />
 
         <!-- Show Batch Code only if editing -->
-        <div class="col-md-6" th:if="${entry.batchCode != null}">
+        <div class="col-md-6" th:if="${entry.id != null}">
             <label for="batchCode">Batch Code</label>
             <input type="text" id="batchCode" th:field="*{batchCode}" class="form-control" readonly />
         </div>
@@ -49,7 +49,7 @@
         <!-- Unit -->
         <div class="col-md-3">
             <label for="unit">Unit</label>
-            <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..." required />
+            <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..." value="Packet" />
         </div>
 
         <!-- Entry Date -->
