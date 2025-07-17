@@ -120,7 +120,8 @@
                         data.forEach(batch => {
                             const option = document.createElement('option');
                             option.value = batch.batchCode;
-                            option.textContent = batch.batchCode;
+                            const formattedDate = batch.entryDate ? ` (${batch.entryDate})` : '';
+                            option.textContent = `${batch.batchCode}${formattedDate}`;
                             option.setAttribute('data-qty', batch.availableQuantity);
                             if (batch.batchCode === selected) {
                                 option.selected = true;
