@@ -54,7 +54,9 @@ public class ExpenseController {
 
     @GetMapping("/new")
     public String form(Model model) {
-        model.addAttribute("entry", new ExpenseEntry());
+        ExpenseEntry entry = new ExpenseEntry();
+        entry.setExpenseDate(LocalDate.now());
+        model.addAttribute("entry", entry);
         return "expenses/form";
     }
 
