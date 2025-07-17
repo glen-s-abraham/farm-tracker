@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" 
-      th:replace="layout/layout :: layout(~{::body}, 'Inventory Form')">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="layout/layout :: layout(~{::body}, 'Inventory Form')">
 
 <body>
     <h2 th:text="${entry.id} == null ? 'Add Inventory Entry' : 'Edit Inventory Entry'"></h2>
@@ -20,7 +19,7 @@
             <select id="productId" name="productId" class="form-select select2" required>
                 <option value="" disabled>Select a product</option>
                 <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"
-                        th:selected="${p.id} == ${entry.product?.id}"></option>
+                    th:selected="${p.id} == ${entry.product?.id}"></option>
             </select>
         </div>
 
@@ -30,7 +29,7 @@
             <select id="cycleId" name="cycleId" class="form-select select2" required>
                 <option value="" disabled>Select a cycle</option>
                 <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
-                        th:selected="${c.id} == ${entry.cycle?.id}"></option>
+                    th:selected="${c.id} == ${entry.cycle?.id}"></option>
             </select>
         </div>
 
@@ -49,22 +48,31 @@
         <!-- Unit -->
         <div class="col-md-3">
             <label for="unit">Unit</label>
-            <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..." value="Packet" />
+            <input type="text" id="unit" th:field="*{unit}" class="form-control" placeholder="kg, packet..."
+                value="Packet" />
         </div>
 
         <!-- Entry Date -->
         <div class="col-md-3">
             <label for="entryDate">Entry Date</label>
             <input type="date" id="entryDate" name="entryDate" class="form-control" required
-                   th:value="${#temporals.format(entry.entryDate, 'yyyy-MM-dd')}" />
+                th:value="${#temporals.format(entry.entryDate, 'yyyy-MM-dd')}" />
         </div>
 
         <!-- Expiry Date -->
+        <!-- Expiry Days -->
+        <div class="col-md-3">
+            <label for="expiryDays">Expiry Days</label>
+            <input type="number" id="expiryDays" class="form-control" placeholder="e.g. 2" value="2"/>
+        </div>
+
+        <!-- Calculated Expiry Date -->
         <div class="col-md-3">
             <label for="expiryDate">Expiry Date</label>
-            <input type="date" id="expiryDate" name="expiryDate" class="form-control"
-                   th:value="${#temporals.format(entry.expiryDate, 'yyyy-MM-dd')}" />
+            <input type="date" id="expiryDate" name="expiryDate" class="form-control" th:field="*{expiryDate}"
+                readonly />
         </div>
+
 
         <!-- Remarks -->
         <div class="col-12">
@@ -84,12 +92,32 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            $('.select2').select2({
-                theme: 'bootstrap-5',
-                width: '100%'
-            });
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.select2').select2({ theme: 'bootstrap-5', width: '100%' });
+
+        const entryDateInput = document.getElementById('entryDate');
+        const expiryDaysInput = document.getElementById('expiryDays');
+        const expiryDateInput = document.getElementById('expiryDate');
+
+        function calculateExpiryDate() {
+            const days = parseInt(expiryDaysInput.value, 10);
+            const entryDate = new Date(entryDateInput.value);
+
+            if (!isNaN(days) && entryDate.toString() !== 'Invalid Date') {
+                const resultDate = new Date(entryDate);
+                resultDate.setDate(resultDate.getDate() + days);
+                expiryDateInput.value = resultDate.toISOString().split('T')[0];
+            }
+        }
+
+        expiryDaysInput.addEventListener('input', calculateExpiryDate);
+        entryDateInput.addEventListener('change', calculateExpiryDate);
+
+        // Set expiry date initially
+        calculateExpiryDate();
+    });
+</script>
+
 </body>
+
 </html>
