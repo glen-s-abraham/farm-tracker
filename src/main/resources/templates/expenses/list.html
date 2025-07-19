@@ -28,6 +28,16 @@
                         <input type="text" name="keyword" th:value="${keyword}" class="form-control"
                             placeholder="Description / Category / Remarks">
                     </div>
+                    <!-- Cycle Filter -->
+                    <div class="col-md-3 col-sm-6">
+                        <label class="form-label">Cycle</label>
+                        <select name="cycleId" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
+                                th:selected="${cycleId != null and cycleId == c.id}"></option>
+                        </select>
+                    </div>
+
 
                     <!-- Date From -->
                     <div class="col-md-2 col-sm-6">

@@ -38,10 +38,11 @@ public class ExpenseController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expenseFrom,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate expenseTo,
             @RequestParam(required = false) ExpenseType type,
+            @RequestParam(required = false) Long cycleId,
             Model model) {
 
         Page<ExpenseEntry> expensesPage = service.getFilteredPaginated(
-                keyword, expenseFrom, expenseTo, type, sortField, sortDir, page, size);
+                keyword, expenseFrom, expenseTo, type, cycleId, sortField, sortDir, page, size);
 
         model.addAttribute("expensesPage", expensesPage);
         model.addAttribute("keyword", keyword);
@@ -50,6 +51,8 @@ public class ExpenseController {
         model.addAttribute("expenseFrom", expenseFrom);
         model.addAttribute("expenseTo", expenseTo);
         model.addAttribute("type", type);
+        model.addAttribute("cycleId", cycleId);
+        model.addAttribute("cycles", cycleService.getAll());
 
         return "expenses/list";
     }
@@ -59,7 +62,7 @@ public class ExpenseController {
         ExpenseEntry entry = new ExpenseEntry();
         entry.setExpenseDate(LocalDate.now());
         model.addAttribute("entry", entry);
-         model.addAttribute("cycles", cycleService.getAll());
+        model.addAttribute("cycles", cycleService.getAll());
         return "expenses/form";
     }
 

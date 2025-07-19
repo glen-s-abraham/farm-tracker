@@ -21,7 +21,7 @@ public interface IExpenseService {
 
     Page<ExpenseEntry> getFilteredPaginated(String keyword,
             LocalDate expenseFrom, LocalDate expenseTo,
-            ExpenseType type,
+            ExpenseType type, Long cycleId,
             String sortField, String sortDir,
             int page, int size);
 

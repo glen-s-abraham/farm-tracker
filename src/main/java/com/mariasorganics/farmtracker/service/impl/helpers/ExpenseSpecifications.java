@@ -1,4 +1,5 @@
 package com.mariasorganics.farmtracker.service.impl.helpers;
+
 import com.mariasorganics.farmtracker.entity.ExpenseEntry;
 import com.mariasorganics.farmtracker.enums.ExpenseType;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,13 +10,13 @@ public class ExpenseSpecifications {
 
     public static Specification<ExpenseEntry> hasKeyword(String keyword) {
         return (root, query, cb) -> {
-            if (keyword == null || keyword.isBlank()) return null;
+            if (keyword == null || keyword.isBlank())
+                return null;
             String like = "%" + keyword.toLowerCase() + "%";
             return cb.or(
-                cb.like(cb.lower(root.get("description")), like),
-                cb.like(cb.lower(root.get("category")), like),
-                cb.like(cb.lower(root.get("remarks")), like)
-            );
+                    cb.like(cb.lower(root.get("description")), like),
+                    cb.like(cb.lower(root.get("category")), like),
+                    cb.like(cb.lower(root.get("remarks")), like));
         };
     }
 
@@ -35,4 +36,9 @@ public class ExpenseSpecifications {
     public static Specification<ExpenseEntry> typeIs(ExpenseType type) {
         return (root, query, cb) -> type != null ? cb.equal(root.get("type"), type) : null;
     }
+
+    public static Specification<ExpenseEntry> cycleIs(Long cycleId) {
+        return (root, query, cb) -> cycleId != null ? cb.equal(root.get("cycle").get("id"), cycleId) : null;
+    }
+
 }

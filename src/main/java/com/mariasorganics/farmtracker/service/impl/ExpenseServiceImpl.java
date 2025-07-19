@@ -51,17 +51,36 @@ public class ExpenseServiceImpl implements IExpenseService {
         return repo.findAll(pageable);
     }
 
-    @Override
+    // @Override
+    // public Page<ExpenseEntry> getFilteredPaginated(String keyword,
+    // LocalDate expenseFrom, LocalDate expenseTo,
+    // ExpenseType type,
+    // String sortField, String sortDir,
+    // int page, int size) {
+
+    // Specification<ExpenseEntry> spec = Specification
+    // .where(hasKeyword(keyword))
+    // .and(expenseDateBetween(expenseFrom, expenseTo))
+    // .and(typeIs(type));
+
+    // Sort sort = Sort.by(sortField != null ? sortField : "expenseDate");
+    // sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() :
+    // sort.descending();
+
+    // Pageable pageable = PageRequest.of(page, size, sort);
+    // return repo.findAll(spec, pageable);
+    // }
     public Page<ExpenseEntry> getFilteredPaginated(String keyword,
             LocalDate expenseFrom, LocalDate expenseTo,
-            ExpenseType type,
+            ExpenseType type, Long cycleId,
             String sortField, String sortDir,
             int page, int size) {
 
         Specification<ExpenseEntry> spec = Specification
                 .where(hasKeyword(keyword))
                 .and(expenseDateBetween(expenseFrom, expenseTo))
-                .and(typeIs(type));
+                .and(typeIs(type))
+                .and(cycleIs(cycleId)); // ✅ new condition
 
         Sort sort = Sort.by(sortField != null ? sortField : "expenseDate");
         sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() : sort.descending();
@@ -69,4 +88,5 @@ public class ExpenseServiceImpl implements IExpenseService {
         Pageable pageable = PageRequest.of(page, size, sort);
         return repo.findAll(spec, pageable);
     }
+
 }
