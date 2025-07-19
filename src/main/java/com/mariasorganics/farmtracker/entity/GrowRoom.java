@@ -1,5 +1,8 @@
 package com.mariasorganics.farmtracker.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +16,10 @@ public class GrowRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;  // e.g., Room A, Room B
+    private String name;
+    private String location;
 
-    private String location; // optional, if needed
+    @OneToMany(mappedBy = "growRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Cycle> cycles = new ArrayList();
 }
+

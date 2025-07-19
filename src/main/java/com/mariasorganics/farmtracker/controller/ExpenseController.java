@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mariasorganics.farmtracker.entity.ExpenseEntry;
 import com.mariasorganics.farmtracker.enums.ExpenseType;
+import com.mariasorganics.farmtracker.service.ICycleService;
 import com.mariasorganics.farmtracker.service.IExpenseService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 public class ExpenseController {
 
     private final IExpenseService service;
+    private final ICycleService cycleService;
 
     @GetMapping
     public String list(
@@ -57,12 +59,14 @@ public class ExpenseController {
         ExpenseEntry entry = new ExpenseEntry();
         entry.setExpenseDate(LocalDate.now());
         model.addAttribute("entry", entry);
+         model.addAttribute("cycles", cycleService.getAll());
         return "expenses/form";
     }
 
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model) {
         model.addAttribute("entry", service.getById(id));
+        model.addAttribute("cycles", cycleService.getAll());
         return "expenses/form";
     }
 

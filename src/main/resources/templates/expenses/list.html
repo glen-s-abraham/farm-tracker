@@ -83,6 +83,7 @@
             <thead class="table-light">
                 <tr>
                     <th>ID</th>
+                    <th>Cycle</th>
                     <th>Description</th>
                     <th>Category</th>
                     <th>Type</th>
@@ -95,6 +96,7 @@
             <tbody>
                 <tr th:each="entry : ${expensesPage.content}">
                     <td th:text="${entry.id}"></td>
+                    <td th:text="${entry.cycle != null ? entry.cycle.name : '—'}"></td>
                     <td th:text="${entry.description}"></td>
                     <td th:text="${entry.category}"></td>
                     <td th:text="${entry.type}"></td>

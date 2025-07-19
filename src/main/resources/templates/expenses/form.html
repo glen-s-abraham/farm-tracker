@@ -12,6 +12,25 @@
             <form th:action="@{/expenses/save}" th:object="${entry}" method="post">
                 <input type="hidden" th:field="*{id}" />
 
+                <!-- Is Cycle Related -->
+                <div class="mb-3">
+                    <label class="form-label">Is this related to a Cycle?</label>
+                    <select class="form-select" id="isCycleRelated">
+                        <option value="no">No</option>
+                        <option value="yes" th:selected="${entry.cycle != null}">Yes</option>
+                    </select>
+                </div>
+
+                <!-- Cycle Selection -->
+                <div class="mb-3" id="cycleSelectGroup" style="display:none">
+                    <label class="form-label">Select Cycle</label>
+                    <select class="form-select" th:field="*{cycle.id}" id="cycleSelect">
+                        <option value="" disabled>Select a cycle</option>
+                        <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"></option>
+                    </select>
+                </div>
+
+
                 <div class="mb-3">
                     <label class="form-label">Description</label>
                     <input type="text" th:field="*{description}" class="form-control" required />
@@ -62,6 +81,27 @@
             </form>
         </div>
     </div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const isCycleRelated = document.getElementById("isCycleRelated");
+        const cycleGroup = document.getElementById("cycleSelectGroup");
+        const cycleSelect = document.getElementById("cycleSelect");
+
+        function toggleCycleSelect() {
+            if (isCycleRelated.value === "yes") {
+                cycleGroup.style.display = "block";
+            } else {
+                cycleGroup.style.display = "none";
+                cycleSelect.value = ""; // Clear cycle selection
+            }
+        }
+
+        isCycleRelated.addEventListener("change", toggleCycleSelect);
+        toggleCycleSelect(); // run on page load
+    });
+</script>
+
+
 </body>
 
 </html>

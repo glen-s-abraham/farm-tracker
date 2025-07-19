@@ -99,10 +99,13 @@
                 fetchLatestBatch(productSelect.value);
             }
 
-            productSelect.addEventListener('change', function () {
-                loadBatches(this.value);
-                fetchLatestBatch(this.value);
+            $('#productSelect').on('change', function () {
+                const productId = $(this).val();
+                loadBatches(productId);
+                fetchLatestBatch(productId);
             });
+
+
 
             batchSelect.addEventListener('change', function () {
                 const qty = this.options[this.selectedIndex]?.getAttribute('data-qty');
@@ -110,7 +113,7 @@
             });
 
             function loadBatches(productId, selected = null) {
-                batchSelect.innerHTML = '<option value="" disabled>Loading...</option>';
+                batchSelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
                 availableQtyInput.value = '';
 
                 fetch(`/api/inventory/batches?productId=${productId}`)
@@ -123,15 +126,23 @@
                             const formattedDate = batch.entryDate ? ` (${batch.entryDate})` : '';
                             option.textContent = `${batch.batchCode}${formattedDate}`;
                             option.setAttribute('data-qty', batch.availableQuantity);
+
                             if (batch.batchCode === selected) {
                                 option.selected = true;
                                 availableQtyInput.value = batch.availableQuantity;
                             }
+
                             batchSelect.appendChild(option);
                         });
-                        batchSelect.dispatchEvent(new Event('change'));
+
+                        // If no match was selected previously, ensure dropdown gets reset
+                        if (!selected) {
+                            batchSelect.selectedIndex = 0;
+                            batchSelect.dispatchEvent(new Event('change'));
+                        }
                     });
             }
+
 
             function fetchLatestBatch(productId) {
                 fetch(`/api/inventory/latest-batch?productId=${productId}`)

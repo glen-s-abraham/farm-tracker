@@ -1,6 +1,8 @@
 package com.mariasorganics.farmtracker.entity;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,7 +13,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cycle {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,14 +22,21 @@ public class Cycle {
     private GrowRoom growRoom;
 
     private LocalDate startDate;
-
-    private String name; // Auto-generated as growRoom.name + "_" + startDate (e.g., "RoomA_2025-07-14")
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
+
+    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InventoryEntry> inventoryEntries = new ArrayList();
+
+    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExpenseEntry> expenses = new ArrayList<>();
+
 
     public enum Status {
         ACTIVE,
         COMPLETED
     }
 }
+
