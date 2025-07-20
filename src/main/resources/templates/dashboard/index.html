@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" th:replace="layout/layout :: layout (~{::body}, 'Dashboard')">
+
+<body>
+<div class="container mt-4">
+    <h2>📊 Farm Dashboard</h2>
+
+    <!-- Filter -->
+    <form method="get" th:action="@{/dashboard}" class="row g-3 align-items-end mb-4">
+        <div class="col-md-3">
+            <label class="form-label">From Date</label>
+            <input type="date" name="from" th:value="${from}" class="form-control" required />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">To Date</label>
+            <input type="date" name="to" th:value="${to}" class="form-control" required />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100 mt-4">🔍 Refresh</button>
+        </div>
+    </form>
+
+    <!-- Inventory Metrics -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">📦 Inventory Summary</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th>Current Quantity</th>
+                    <th>Turnover Ratio</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${dashboard.inventory.currentInventoryPerProduct.entrySet()}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                    <td th:text="${dashboard.inventory.inventoryTurnoverPerProduct[entry.key]}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sales Metrics -->
+    <div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">💰 Sales Summary</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Total Sales:</strong> ₹<span th:text="${dashboard.sales.totalSalesValue}"></span></p>
+        <table class="table table-bordered">
+            <thead class="table-light">
+            <tr>
+                <th>Product</th>
+                <th>Quantity Sold</th>
+                <th>Average Price/Unit (₹)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="entry : ${dashboard.sales.salesByProduct.entrySet()}">
+                <td th:text="${entry.key}"></td>
+                <td th:text="${entry.value}"></td>
+                <td th:text="${dashboard.sales.averagePricePerProduct[entry.key]}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+    <!-- Expense Metrics -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">🧾 Expense Summary</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Total Expenses:</strong> ₹<span th:text="${dashboard.expenses.totalExpense}"></span></p>
+            <p><strong>CAPEX:</strong> ₹<span th:text="${dashboard.expenses.capex}"></span> |
+                <strong>OPEX:</strong> ₹<span th:text="${dashboard.expenses.opex}"></span></p>
+            <table class="table table-bordered">
+                <thead class="table-light">
+                <tr>
+                    <th>Category</th>
+                    <th>Total Amount (₹)</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="entry : ${dashboard.expenses.expenseByCategory.entrySet()}">
+                    <td th:text="${entry.key}"></td>
+                    <td th:text="${entry.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Cycle Efficiency -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">🌱 Cycle Efficiency</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="table-light">
+                <tr>
+                    <th>Cycle</th>
+                    <th>Total Harvested</th>
+                    <th>Total Expense</th>
+                    <th>Cost per Unit</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cycle : ${dashboard.cycles.yields}">
+                    <td th:text="${cycle.cycleName}"></td>
+                    <td th:text="${cycle.totalHarvested}"></td>
+                    <td th:text="${cycle.totalExpense}"></td>
+                    <td th:text="${cycle.costPerUnit}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>
