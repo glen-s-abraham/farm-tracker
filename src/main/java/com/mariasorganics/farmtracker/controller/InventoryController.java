@@ -7,6 +7,8 @@ import com.mariasorganics.farmtracker.service.ICycleService;
 import com.mariasorganics.farmtracker.service.IInventoryService;
 import com.mariasorganics.farmtracker.service.IProductService;
 import java.time.LocalDate;
+import java.time.LocalTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
@@ -57,8 +59,13 @@ public class InventoryController {
    public String createForm(Model model) {
       InventoryEntry entry = new InventoryEntry();
       entry.setUnit("Packet"); // Default unit
-      entry.setEntryDate(LocalDate.now()); // Today's date
-      entry.setExpiryDate(LocalDate.now().plusDays(2)); // +2 days from today
+      LocalDate entryDate = LocalDate.now();
+      LocalTime now = LocalTime.now();
+      if (now.isAfter(LocalTime.of(17, 0))) {
+         entryDate = entryDate.plusDays(1);
+      }
+      entry.setEntryDate(entryDate); // Today's date
+      entry.setExpiryDate(entryDate.plusDays(2)); // +2 days from today
 
       model.addAttribute("entry", entry);
       model.addAttribute("products", this.productService.getAllProducts());
