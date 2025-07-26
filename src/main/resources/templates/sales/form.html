@@ -20,6 +20,16 @@
                         <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
                     </select>
                 </div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Cycle (Optional)</label>
+                    <select class="form-select" th:field="*{cycle.id}">
+                        <option value="">-- Select Cycle --</option>
+                        <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
+                            th:selected="${c.id} == ${entry.cycle?.id}"></option>
+                    </select>
+                </div>
+
 
                 <!-- Batch Code -->
                 <div class="mb-3">

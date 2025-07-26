@@ -1,6 +1,5 @@
 package com.mariasorganics.farmtracker.entity;
 
-
 import java.time.LocalDate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,8 +14,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class SalesEntry extends Auditable<String>{
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class SalesEntry extends Auditable<String> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,6 +28,10 @@ public class SalesEntry extends Auditable<String>{
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "cycle_id", nullable = true)
+    private Cycle cycle;
 
     private double quantitySold;
     private String unit;
@@ -38,4 +44,7 @@ public class SalesEntry extends Auditable<String>{
 
     @Transient
     private Long productId;
+
+    @Transient
+    private Long cycleId;
 }

@@ -1,8 +1,10 @@
 package com.mariasorganics.farmtracker.controller;
 
+import com.mariasorganics.farmtracker.entity.Cycle;
 import com.mariasorganics.farmtracker.entity.Product;
 import com.mariasorganics.farmtracker.entity.SalesEntry;
 import com.mariasorganics.farmtracker.exception.ResourceNotFoundException;
+import com.mariasorganics.farmtracker.service.ICycleService;
 import com.mariasorganics.farmtracker.service.IInventoryService;
 import com.mariasorganics.farmtracker.service.IProductService;
 import com.mariasorganics.farmtracker.service.ISalesService;
@@ -25,10 +27,12 @@ public class SalesController {
 
     private final ISalesService salesService;
     private final IProductService productService;
+    private final ICycleService cycleService;
 
-    public SalesController(ISalesService salesService, IProductService productService) {
+    public SalesController(ISalesService salesService, IProductService productService, ICycleService cycleService) {
         this.salesService = salesService;
         this.productService = productService;
+        this.cycleService = cycleService;
     }
 
     @GetMapping
@@ -62,6 +66,7 @@ public class SalesController {
         entry.setPricePerUnit(100);
         model.addAttribute("entry", entry); // ensure 'entry' is never null
         model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("cycles", cycleService.getAll());
         return "sales/form";
     }
 
@@ -73,6 +78,7 @@ public class SalesController {
         }
         model.addAttribute("entry", entry);
         model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("cycles", cycleService.getAll());
         return "sales/form";
     }
 
@@ -86,6 +92,13 @@ public class SalesController {
         Product product = productService.getById(entry.getProductId());
         if (product == null) {
             throw new ResourceNotFoundException("Product not found for ID: " + entry.getProductId());
+        }
+
+        if (entry.getCycle() != null && entry.getCycle().getId() != null) {
+            Cycle cycle = cycleService.getById(entry.getCycle().getId());
+            entry.setCycle(cycle);
+        } else {
+            entry.setCycle(null);
         }
 
         entry.setProduct(product);
