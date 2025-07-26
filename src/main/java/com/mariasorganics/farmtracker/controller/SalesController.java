@@ -40,6 +40,7 @@ public class SalesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long cycleId,
             @RequestParam(required = false) String sortField,
             @RequestParam(required = false, defaultValue = "desc") String sortDir,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate saleFrom,
@@ -47,7 +48,7 @@ public class SalesController {
             Model model) {
 
         Page<SalesEntry> salesEntryPage = salesService.getFilteredPaginated(
-                keyword, saleFrom, saleTo, sortField, sortDir, page, size);
+                keyword, cycleId, saleFrom, saleTo, sortField, sortDir, page, size);
 
         model.addAttribute("salesEntryPage", salesEntryPage);
         model.addAttribute("keyword", keyword);
@@ -55,6 +56,9 @@ public class SalesController {
         model.addAttribute("saleTo", saleTo);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDir", sortDir);
+        model.addAttribute("cycles", cycleService.getAll());
+        model.addAttribute("cycleId", cycleId);
+
         return "sales/list";
     }
 

@@ -15,6 +15,7 @@ public interface ISalesService {
     Page<SalesEntry> getPaginated(int page, int size);
     Page<SalesEntry> getFilteredPaginated(
         String keyword,
+        Long cycleId,
         LocalDate saleFrom, LocalDate saleTo,
         String sortField, String sortDir,
         int page, int size);

@@ -23,6 +23,15 @@
                         <input type="text" name="keyword" th:value="${keyword}" class="form-control"
                             placeholder="Batch / Product / Customer / Remarks">
                     </div>
+                    <div class="col-md-2 col-sm-6">
+                        <label class="form-label">Cycle</label>
+                        <select name="cycleId" class="form-select">
+                            <option value="">-- All --</option>
+                            <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
+                                th:selected="${cycleId == c.id}"></option>
+                        </select>
+                    </div>
+
 
                     <!-- Sale Date From -->
                     <div class="col-md-2 col-sm-6">
@@ -71,6 +80,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Product</th>
+                    <th>Cycle</th>
                     <th>Batch</th>
                     <th>Quantity</th>
                     <th>Price/Unit (₹)</th>
@@ -83,6 +93,7 @@
                 <tr th:each="entry : ${salesEntryPage.content}">
                     <td th:text="${entry.id}"></td>
                     <td th:text="${entry.product.name}"></td>
+                    <td th:text="${entry.cycle != null ? entry.cycle.name : '--'}"></td>
                     <td th:text="${entry.batchCode}"></td>
                     <td th:text="${entry.quantitySold + ' ' + entry.unit}"></td>
                     <td th:text="${entry.pricePerUnit}"></td>

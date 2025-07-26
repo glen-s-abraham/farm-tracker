@@ -1,6 +1,5 @@
 package com.mariasorganics.farmtracker.service.impl.helpers;
 
-
 import com.mariasorganics.farmtracker.entity.SalesEntry;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -10,15 +9,15 @@ public class SalesSpecifications {
 
     public static Specification<SalesEntry> hasKeyword(String keyword) {
         return (root, query, cb) -> {
-            if (keyword == null || keyword.isBlank()) return null;
+            if (keyword == null || keyword.isBlank())
+                return null;
             String like = "%" + keyword.toLowerCase() + "%";
 
             return cb.or(
-                cb.like(cb.lower(root.get("batchCode")), like),
-                cb.like(cb.lower(root.get("customerName")), like),
-                cb.like(cb.lower(root.get("remarks")), like),
-                cb.like(cb.lower(root.get("product").get("name")), like)
-            );
+                    cb.like(cb.lower(root.get("batchCode")), like),
+                    cb.like(cb.lower(root.get("customerName")), like),
+                    cb.like(cb.lower(root.get("remarks")), like),
+                    cb.like(cb.lower(root.get("product").get("name")), like));
         };
     }
 
@@ -34,4 +33,13 @@ public class SalesSpecifications {
             return null;
         };
     }
+
+    public static Specification<SalesEntry> hasCycle(Long cycleId) {
+        return (root, query, cb) -> {
+            if (cycleId == null)
+                return null;
+            return cb.equal(root.get("cycle").get("id"), cycleId);
+        };
+    }
+
 }

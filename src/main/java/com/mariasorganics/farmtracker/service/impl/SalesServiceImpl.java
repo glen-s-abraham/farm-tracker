@@ -144,12 +144,14 @@ public class SalesServiceImpl implements ISalesService {
 
     public Page<SalesEntry> getFilteredPaginated(
             String keyword,
+            Long cycleId,
             LocalDate saleFrom, LocalDate saleTo,
             String sortField, String sortDir,
             int page, int size) {
 
         Specification<SalesEntry> spec = Specification.where(hasKeyword(keyword))
-                .and(saleDateBetween(saleFrom, saleTo));
+                .and(saleDateBetween(saleFrom, saleTo))
+                .and(hasCycle(cycleId));
 
         Sort sort = Sort.by(sortField != null ? sortField : "id");
         sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() : sort.descending();
