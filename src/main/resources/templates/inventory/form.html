@@ -23,15 +23,24 @@
             </select>
         </div>
 
-        <!-- Cycle Dropdown -->
+        <!-- Grow Room Dropdown -->
         <div class="col-md-6">
-            <label for="cycleId">Cycle</label>
-            <select id="cycleId" name="cycleId" class="form-select select2" required>
-                <option value="" disabled>Select a cycle</option>
-                <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
-                    th:selected="${c.id} == ${entry.cycle?.id}"></option>
+            <label for="growRoomId">Grow Room</label>
+            <select id="growRoomId" name="growRoomId" class="form-select select2" required>
+                <option value="" disabled>Select a grow room</option>
+                <option th:each="room : ${rooms}" th:value="${room.id}" th:text="${room.name}"
+                    th:selected="${room.id} == ${entry.cycle?.growRoom?.id}"></option>
             </select>
         </div>
+
+        <!-- Readonly Cycle -->
+        <div class="col-md-6">
+            <label for="cycleName">Cycle</label>
+            <input type="text" id="cycleName" class="form-control" readonly />
+            <input type="hidden" th:field="*{cycle.id}" id="cycleId" name="cycle.id" />
+
+        </div>
+
 
         <!-- Show Harvest Count only if editing -->
         <div class="col-md-3" th:if="${entry.id != null}">
@@ -63,7 +72,7 @@
         <!-- Expiry Days -->
         <div class="col-md-3">
             <label for="expiryDays">Expiry Days</label>
-            <input type="number" id="expiryDays" class="form-control" placeholder="e.g. 2" value="2"/>
+            <input type="number" id="expiryDays" class="form-control" placeholder="e.g. 2" value="2" />
         </div>
 
         <!-- Calculated Expiry Date -->
@@ -92,31 +101,63 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        $('.select2').select2({ theme: 'bootstrap-5', width: '100%' });
+        $(document).ready(function () {
+            $('.select2').select2({ theme: 'bootstrap-5', width: '100%' });
 
-        const entryDateInput = document.getElementById('entryDate');
-        const expiryDaysInput = document.getElementById('expiryDays');
-        const expiryDateInput = document.getElementById('expiryDate');
+            const cycleNameInput = document.getElementById('cycleName');
+            const cycleIdHidden = document.getElementById('cycleId');
 
-        function calculateExpiryDate() {
-            const days = parseInt(expiryDaysInput.value, 10);
-            const entryDate = new Date(entryDateInput.value);
-
-            if (!isNaN(days) && entryDate.toString() !== 'Invalid Date') {
-                const resultDate = new Date(entryDate);
-                resultDate.setDate(resultDate.getDate() + days);
-                expiryDateInput.value = resultDate.toISOString().split('T')[0];
+            function fetchCycle(growRoomId) {
+                if (growRoomId) {
+                    fetch(`/api/inventory/active-cycle?growRoomId=${growRoomId}`)
+                        .then(res => res.ok ? res.json() : Promise.reject())
+                        .then(data => {
+                            cycleNameInput.value = data.name;
+                            cycleIdHidden.value = data.id;
+                        })
+                        .catch(() => {
+                            cycleNameInput.value = 'No ACTIVE cycle';
+                            cycleIdHidden.value = '';
+                        });
+                }
             }
-        }
 
-        expiryDaysInput.addEventListener('input', calculateExpiryDate);
-        entryDateInput.addEventListener('change', calculateExpiryDate);
+            // ✅ Use jQuery event for select2 change
+            $('#growRoomId').on('change.select2', function () {
+                const selectedValue = $(this).val();
+                fetchCycle(selectedValue);
+            });
 
-        // Set expiry date initially
-        calculateExpiryDate();
-    });
-</script>
+            // ✅ Trigger once on load if pre-selected
+            const initialGrowRoomId = $('#growRoomId').val();
+            if (initialGrowRoomId) {
+                fetchCycle(initialGrowRoomId);
+            }
+
+            // Expiry date logic
+            const entryDateInput = document.getElementById('entryDate');
+            const expiryDaysInput = document.getElementById('expiryDays');
+            const expiryDateInput = document.getElementById('expiryDate');
+
+            function calculateExpiryDate() {
+                const days = parseInt(expiryDaysInput.value, 10);
+                const entryDate = new Date(entryDateInput.value);
+
+                if (!isNaN(days) && entryDate.toString() !== 'Invalid Date') {
+                    const resultDate = new Date(entryDate);
+                    resultDate.setDate(resultDate.getDate() + days);
+                    expiryDateInput.value = resultDate.toISOString().split('T')[0];
+                }
+            }
+
+            expiryDaysInput.addEventListener('input', calculateExpiryDate);
+            entryDateInput.addEventListener('change', calculateExpiryDate);
+            calculateExpiryDate();
+        });
+
+    </script>
+
+
 
 </body>
 

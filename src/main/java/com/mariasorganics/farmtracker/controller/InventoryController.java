@@ -1,9 +1,11 @@
 // Source code is decompiled from a .class file using FernFlower decompiler.
 package com.mariasorganics.farmtracker.controller;
 
+import com.mariasorganics.farmtracker.entity.Cycle;
 import com.mariasorganics.farmtracker.entity.InventoryEntry;
 import com.mariasorganics.farmtracker.entity.Product;
 import com.mariasorganics.farmtracker.service.ICycleService;
+import com.mariasorganics.farmtracker.service.IGrowRoomService;
 import com.mariasorganics.farmtracker.service.IInventoryService;
 import com.mariasorganics.farmtracker.service.IProductService;
 import java.time.LocalDate;
@@ -26,12 +28,14 @@ public class InventoryController {
    private final IInventoryService inventoryService;
    private final IProductService productService;
    private final ICycleService cycleService;
+   private final IGrowRoomService growRoomService;
 
    public InventoryController(IInventoryService inventoryService, IProductService productService,
-         ICycleService cycleService) {
+         ICycleService cycleService, IGrowRoomService growRoomService) {
       this.inventoryService = inventoryService;
       this.productService = productService;
       this.cycleService = cycleService;
+      this.growRoomService = growRoomService;
    }
 
    @GetMapping
@@ -69,18 +73,29 @@ public class InventoryController {
 
       model.addAttribute("entry", entry);
       model.addAttribute("products", this.productService.getAllProducts());
-      model.addAttribute("cycles", this.cycleService.getAll());
+      model.addAttribute("rooms", growRoomService.getAll());
+
       return "inventory/form";
    }
 
    @PostMapping({ "/save" })
    public String save(@ModelAttribute InventoryEntry entry) {
-      Product product = this.productService.getById(entry.getProductId());
+      Product product = productService.getById(entry.getProductId());
       entry.setProduct(product);
-      if (entry.getId() == null) {
-         this.inventoryService.create(entry);
+
+      // ✅ Set the Cycle from the ID
+      if (entry.getCycle() != null && entry.getCycle().getId() != null) {
+         Cycle cycle = cycleService.getById(entry.getCycle().getId());
+         entry.setCycle(cycle);
+         entry.setCycleId(cycle.getId());
       } else {
-         this.inventoryService.update(entry.getId(), entry);
+         throw new IllegalArgumentException("Cycle must be selected.");
+      }
+
+      if (entry.getId() == null) {
+         inventoryService.create(entry);
+      } else {
+         inventoryService.update(entry.getId(), entry);
       }
 
       return "redirect:/inventory";
@@ -90,7 +105,7 @@ public class InventoryController {
    public String editForm(@PathVariable Long id, Model model) {
       model.addAttribute("entry", this.inventoryService.getById(id));
       model.addAttribute("products", this.productService.getAllProducts());
-      model.addAttribute("cycles", this.cycleService.getAll());
+      model.addAttribute("rooms", growRoomService.getAll());
       return "inventory/form";
    }
 

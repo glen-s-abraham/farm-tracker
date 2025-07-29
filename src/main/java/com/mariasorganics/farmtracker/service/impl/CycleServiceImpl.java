@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CycleServiceImpl implements ICycleService {
@@ -82,4 +83,10 @@ public class CycleServiceImpl implements ICycleService {
     public String generateCycleName(Long growRoomId, String growRoomName, LocalDate startDate) {
         return growRoomName.replaceAll("\\s+", "") + "_" + startDate;
     }
+
+    @Override
+    public Optional<Cycle> findActiveCycleByGrowRoomId(Long growRoomId) {
+        return cycleRepository.findByGrowRoom_IdAndStatus(growRoomId, Cycle.Status.ACTIVE);
+    }
+
 }

@@ -65,6 +65,6 @@ public class CycleController {
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         cycleService.delete(id);
-        return "redirect:/cycle";
+        return "redirect:/cycles";
     }
 }
