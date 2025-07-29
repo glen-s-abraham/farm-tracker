@@ -8,4 +8,5 @@ import java.util.List;
 public interface CycleRepository extends JpaRepository<Cycle, Long> {
     List<Cycle> findByGrowRoom_IdOrderByStartDateDesc(Long growRoomId);
     boolean existsByName(String name);
+    boolean existsByGrowRoom_IdAndStatus(Long growRoomId, Cycle.Status status);
 }

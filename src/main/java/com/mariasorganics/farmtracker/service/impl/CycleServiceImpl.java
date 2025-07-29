@@ -17,7 +17,7 @@ public class CycleServiceImpl implements ICycleService {
 
     private final GrowRoomRepository growRoomRepository;
 
-    public CycleServiceImpl(CycleRepository cycleRepository,GrowRoomRepository growRoomRepository) {
+    public CycleServiceImpl(CycleRepository cycleRepository, GrowRoomRepository growRoomRepository) {
         this.cycleRepository = cycleRepository;
         this.growRoomRepository = growRoomRepository;
     }
@@ -33,31 +33,45 @@ public class CycleServiceImpl implements ICycleService {
     }
 
     @Override
-public Cycle save(Cycle cycle) {
-    // Ensure grow room is valid and fetched
-    Long growRoomId = cycle.getGrowRoom() != null ? cycle.getGrowRoom().getId() : null;
-    if (growRoomId == null) {
-        throw new IllegalArgumentException("Grow room must be selected.");
-    }
-
-    GrowRoom growRoom = growRoomRepository.findById(growRoomId)
-            .orElseThrow(() -> new RuntimeException("Grow room not found"));
-
-    cycle.setGrowRoom(growRoom); // Now contains name
-
-    if (cycle.getName() == null || cycle.getName().isBlank()) {
-        String baseName = growRoom.getName().replaceAll("\\s+", "") + "_" + cycle.getStartDate();
-        String uniqueName = baseName;
-        int counter = 1;
-        while (cycleRepository.existsByName(uniqueName)) {
-            uniqueName = baseName + "_" + counter++;
+    public Cycle save(Cycle cycle) {
+        // Ensure grow room is valid and fetched
+        Long growRoomId = cycle.getGrowRoom() != null ? cycle.getGrowRoom().getId() : null;
+        if (growRoomId == null) {
+            throw new IllegalArgumentException("Grow room must be selected.");
         }
-        cycle.setName(uniqueName);
+
+        GrowRoom growRoom = growRoomRepository.findById(growRoomId)
+                .orElseThrow(() -> new RuntimeException("Grow room not found"));
+
+        cycle.setGrowRoom(growRoom); // populate grow room with full details
+
+        // 🔒 Enforce only one ACTIVE cycle per grow room
+        if (cycle.getStatus() == Cycle.Status.ACTIVE) {
+            boolean alreadyHasActive = cycleRepository.existsByGrowRoom_IdAndStatus(growRoomId, Cycle.Status.ACTIVE);
+
+            boolean isUpdatingSameCycle = (cycle.getId() != null)
+                    && cycleRepository.findById(cycle.getId())
+                            .map(existing -> existing.getStatus() == Cycle.Status.ACTIVE)
+                            .orElse(false);
+
+            if (alreadyHasActive && !isUpdatingSameCycle) {
+                throw new IllegalArgumentException("Only one ACTIVE cycle is allowed per grow room.");
+            }
+        }
+
+        // Auto-generate name if not provided
+        if (cycle.getName() == null || cycle.getName().isBlank()) {
+            String baseName = growRoom.getName().replaceAll("\\s+", "") + "_" + cycle.getStartDate();
+            String uniqueName = baseName;
+            int counter = 1;
+            while (cycleRepository.existsByName(uniqueName)) {
+                uniqueName = baseName + "_" + counter++;
+            }
+            cycle.setName(uniqueName);
+        }
+
+        return cycleRepository.save(cycle);
     }
-
-    return cycleRepository.save(cycle);
-}
-
 
     @Override
     public void delete(Long id) {

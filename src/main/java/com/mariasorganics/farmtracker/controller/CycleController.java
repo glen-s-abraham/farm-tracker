@@ -3,8 +3,12 @@ package com.mariasorganics.farmtracker.controller;
 import com.mariasorganics.farmtracker.entity.Cycle;
 import com.mariasorganics.farmtracker.service.ICycleService;
 import com.mariasorganics.farmtracker.service.IGrowRoomService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -33,9 +37,22 @@ public class CycleController {
     }
 
     @PostMapping("/save")
-    public String save(@ModelAttribute("entry") Cycle cycle) {
-        cycleService.save(cycle);
-        return "redirect:/cycles";
+    public String save(@ModelAttribute("entry") @Valid Cycle cycle,
+            BindingResult result,
+            Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("rooms", growRoomService.getAll());
+            return "cycle/form";
+        }
+
+        try {
+            cycleService.save(cycle);
+            return "redirect:/cycles";
+        } catch (IllegalArgumentException e) {
+            result.reject("error.global", e.getMessage());
+            model.addAttribute("rooms", growRoomService.getAll());
+            return "cycle/form";
+        }
     }
 
     @GetMapping("/edit/{id}")
@@ -48,6 +65,6 @@ public class CycleController {
     @PostMapping("/delete/{id}")
     public String delete(@PathVariable Long id) {
         cycleService.delete(id);
-        return "redirect:/cycles";
+        return "redirect:/cycle";
     }
 }

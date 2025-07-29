@@ -36,7 +36,8 @@ public class Cycle {
 
     public enum Status {
         ACTIVE,
-        COMPLETED
+        PLANNED,
+        COMPLETED,
     }
 }
 
