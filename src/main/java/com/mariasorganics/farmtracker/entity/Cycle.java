@@ -27,10 +27,10 @@ public class Cycle {
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<InventoryEntry> inventoryEntries = new ArrayList();
 
-    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cycle", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<ExpenseEntry> expenses = new ArrayList<>();
 
 
