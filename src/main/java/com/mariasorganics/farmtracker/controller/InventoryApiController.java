@@ -1,6 +1,7 @@
 package com.mariasorganics.farmtracker.controller;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mariasorganics.farmtracker.entity.Cycle;
+import com.mariasorganics.farmtracker.entity.InventoryEntry;
 import com.mariasorganics.farmtracker.service.ICycleService;
 import com.mariasorganics.farmtracker.service.IInventoryService;
 
@@ -32,8 +34,28 @@ public class InventoryApiController {
     }
 
     @GetMapping("/batches")
-    public List<Map<String, Object>> getBatchesForProduct(@RequestParam Long productId) {
-        return inventoryService.findBatchesByProduct(productId).stream()
+    public List<Map<String, Object>> getBatchesForProduct(
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) Long cycleId) {
+
+        // Load base list
+        List<InventoryEntry> inventories;
+        if (productId != null) {
+            inventories = inventoryService.findBatchesByProduct(productId);
+            // If cycleId also provided, filter in-memory
+            if (cycleId != null) {
+                inventories = inventories.stream()
+                        .filter(e -> e.getCycle() != null && e.getCycle().getId().equals(cycleId))
+                        .collect(Collectors.toList());
+            }
+        } else if (cycleId != null) {
+            // Only cycleId provided
+            inventories = inventoryService.findBatchesByCycle(cycleId);
+        }else{
+            inventories = inventoryService.getAll();
+        }
+
+        return inventories.stream()
                 .map(entry -> {
                     Map<String, Object> map = new HashMap<>();
                     map.put("id", entry.getId());

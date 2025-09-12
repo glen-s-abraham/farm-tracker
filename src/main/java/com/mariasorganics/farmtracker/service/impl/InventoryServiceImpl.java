@@ -95,6 +95,10 @@ public class InventoryServiceImpl implements IInventoryService {
       return this.inventoryEntryRepository.findByProduct_IdOrderByEntryDateDesc(productId);
    }
 
+   public List<InventoryEntry> findBatchesByCycle(Long cycleId) {
+      return this.inventoryEntryRepository.findByCycle_IdOrderByEntryDateDesc(cycleId);
+   }
+
    public Page<InventoryEntry> getPaginated(int page, int size) {
       Pageable pageable = PageRequest.of(page, size, Sort.by(new String[]{"id"}).descending());
       return this.inventoryEntryRepository.findAll(pageable);

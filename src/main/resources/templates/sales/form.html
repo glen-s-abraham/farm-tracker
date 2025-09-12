@@ -20,10 +20,10 @@
                         <option th:each="p : ${products}" th:value="${p.id}" th:text="${p.name}"></option>
                     </select>
                 </div>
-                
+
                 <div class="mb-3">
                     <label class="form-label">Cycle (Optional)</label>
-                    <select class="form-select" th:field="*{cycle.id}">
+                    <select id="cycleSelect" class="form-select" th:field="*{cycle.id}">
                         <option value="">-- Select Cycle --</option>
                         <option th:each="c : ${cycles}" th:value="${c.id}" th:text="${c.name}"
                             th:selected="${c.id} == ${entry.cycle?.id}"></option>
@@ -33,8 +33,7 @@
 
                 <!-- Batch Code -->
                 <div class="mb-3">
-                    <label class="form-label">Batch Code (Latest Batch Code: <code
-                            id="latestBatchCode">N/A</code>)</label>
+                    <label class="form-label">Batch Code</label>
                     <select class="form-select" th:field="*{batchCode}" id="batchSelect" required>
                         <option value="" disabled>Select a batch</option>
                     </select>
@@ -105,15 +104,26 @@
             const latestBatchCodeDisplay = document.getElementById('latestBatchCode');
 
             if (productSelect.value) {
-                loadBatches(productSelect.value, selectedBatchCode);
-                fetchLatestBatch(productSelect.value);
+                loadBatches(productSelect.value, null, selectedBatchCode);
             }
 
             $('#productSelect').on('change', function () {
                 const productId = $(this).val();
                 loadBatches(productId);
-                fetchLatestBatch(productId);
             });
+
+            $('#cycleSelect')
+                .off('change.loadBatches')              // remove any prior same-namespaced handler
+                .on('change.loadBatches', function () {
+                    const productId = $('#productSelect').val() || null;
+                    const cycleId = $(this).val() || null;
+
+                    if (cycleId) {
+                        loadBatches(null, cycleId);                 // filter by cycle (and product if present)
+                    } else if (productId) {
+                        loadBatches(productId, null, selectedBatchCode); // fallback to product-only
+                    }
+                });
 
 
 
@@ -122,11 +132,13 @@
                 availableQtyInput.value = qty || '';
             });
 
-            function loadBatches(productId, selected = null) {
+            function loadBatches(productId = null, cycleId = null, selected = null) {
                 batchSelect.innerHTML = '<option value="" disabled selected>Loading...</option>';
                 availableQtyInput.value = '';
+                let url = productId ? `/api/inventory/batches?productId=${productId}` :
+                    `/api/inventory/batches?cycleId=${cycleId}`
 
-                fetch(`/api/inventory/batches?productId=${productId}`)
+                fetch(url)
                     .then(res => res.json())
                     .then(data => {
                         batchSelect.innerHTML = '<option value="" disabled>Select a batch</option>';
@@ -154,16 +166,6 @@
             }
 
 
-            function fetchLatestBatch(productId) {
-                fetch(`/api/inventory/latest-batch?productId=${productId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        latestBatchCodeDisplay.textContent = data?.batchCode || 'N/A';
-                    })
-                    .catch(() => {
-                        latestBatchCodeDisplay.textContent = 'N/A';
-                    });
-            }
 
             document.getElementById('saleForm').addEventListener('submit', function (e) {
                 const available = parseFloat(availableQtyInput.value || 0);

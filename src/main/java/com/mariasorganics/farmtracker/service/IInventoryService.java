@@ -19,6 +19,8 @@ public interface IInventoryService {
 
    List<InventoryEntry> findBatchesByProduct(Long productId);
 
+   List<InventoryEntry> findBatchesByCycle(Long cycleId);
+
    Page<InventoryEntry> getPaginated(int page, int size);
 
    Page<InventoryEntry> getFilteredPaginated(String keyword, String sortField, String sortDir, LocalDate entryFrom, LocalDate entryTo, LocalDate expiryFrom, LocalDate expiryTo, int page, int size);
