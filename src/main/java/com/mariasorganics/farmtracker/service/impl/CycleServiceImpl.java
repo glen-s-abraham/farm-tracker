@@ -89,4 +89,10 @@ public class CycleServiceImpl implements ICycleService {
         return cycleRepository.findByGrowRoom_IdAndStatus(growRoomId, Cycle.Status.ACTIVE);
     }
 
+    @Override
+    public List<Cycle> getAllActive() {
+        List<Cycle> activCycles = cycleRepository.findByStatus(Cycle.Status.ACTIVE);
+        return activCycles;
+    }
+
 }

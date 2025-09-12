@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface ICycleService {
     List<Cycle> getAll();
+    List<Cycle> getAllActive();
     Cycle getById(Long id);
     Cycle save(Cycle cycle);
     void delete(Long id);

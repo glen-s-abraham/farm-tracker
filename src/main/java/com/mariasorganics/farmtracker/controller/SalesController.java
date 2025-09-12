@@ -70,7 +70,7 @@ public class SalesController {
         entry.setPricePerUnit(100);
         model.addAttribute("entry", entry); // ensure 'entry' is never null
         model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("cycles", cycleService.getAll());
+        model.addAttribute("cycles", cycleService.getAllActive());
         return "sales/form";
     }
 
